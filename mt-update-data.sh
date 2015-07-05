@@ -26,3 +26,4 @@ echo List complete..
 
 xargs --arg-file=./lists/update_temp.txt --max-procs=3 -I IP ./scan-full.sh IP
 
+rm ./lists/update_temp.txt

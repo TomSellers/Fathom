@@ -534,62 +534,49 @@ def port_search (port_num)
             if (port.num == port_num) || ($params['All_Ports'])
               if port.script('ssl-cert')
                 ssl_service = SSLPort.new(host, port, timestamp)
-                
-                puts "Debug: Made it to SSL Level: #{ssl_service.addr} #{ssl_service.num}"
-                
+           
                 # SSL level filtering here
-                
+
                 # Key bits filtering
                 if ssl_service.bits
-                  #puts "     DEBUG: Entering key filtering" if !exclude_port
-                
                   if $params['Key']
-                    #REMOVE - exclude_port = true if !(ssl_service.bits == $params['Key'])
+                    # REMOVE - exclude_port = true if !(ssl_service.bits == $params['Key'])
                     next if !(ssl_service.bits == $params['Key'])
                   end
-                  
-                  #puts "     DEBUG: Made it past exact key filtering" if !exclude_port
-                  
+
                   if $params['KeyMax']
-                    #REMOVE - exclude_port = true if ssl_service.bits > $params['KeyMax']
+                    # REMOVE - exclude_port = true if ssl_service.bits > $params['KeyMax']
                     next if ssl_service.bits > $params['KeyMax']
                   end    
-                  
-                  #puts "     DEBUG: Made it past MAX key filtering" if !exclude_port
-                  
+
                   if $params['KeyMin']
-                    #REMOVE - exclude_port = true if ssl_service.bits < $params['KeyMin']
+                    # REMOVE - exclude_port = true if ssl_service.bits < $params['KeyMin']
                     next if ssl_service.bits < $params['KeyMin']
                   end                 
-                
-                  #puts "     DEBUG: Made it past MIN key filtering" if !exclude_port
-                
                 end
-                
-                #puts "     DEBUG: Made it past ALL key filtering" if !exclude_port
-                
+
                 # Cert date filtering
                 if ssl_service.expire
                   if $params['ssl_expired']
                     next if !(ssl_service.expire < $now)
                   end             
-                
+
                 end
-                
+
                 # If the port passes all tests then add it to the results array
                 if !exclude_port
                   $Results.push(ssl_service)
                 end
 
-                
+
               end  
             end  
           end 
-         
+
         end  # host.getports
-      
+
       end  # parser.host..
-   
+
       timestamp = nil
     end  # begin
   }
