@@ -64,8 +64,8 @@ begin
     end
   end
 
-  #Sort the file list, it won't sort the IPs properly but it is better than
-  #the scattershot listing before.
+  # Sort the file list, it won't sort the IPs properly but it is better than
+  # the scattershot listing before.
   $listing.sort!
 
   if $params['Report_File']
@@ -123,7 +123,7 @@ begin
     script_search $params['Script_data']
   end
 
-  #Exit cleanly
+  # Exit cleanly
   exit_normal
 
 rescue Interrupt
@@ -325,9 +325,9 @@ class ParseArgs
     
     options
   
-  end  #self.parse(args)
+  end  # self.parse(args)
 
-end  #ParseArgs
+end  # ParseArgs
 
 def exit_interrupt
 
@@ -373,7 +373,7 @@ def gen_output (host, port, srv,timestamp, script="")
   
   exclude_result = false
   
-  #Handle specifically excluded OSes
+  # Handle specifically excluded OSes
   if $params['Exclude_os']
   
     host_os = host.os.name
@@ -384,7 +384,7 @@ def gen_output (host, port, srv,timestamp, script="")
     end
   end
   
-  #Allow output to be limited to just certain Oses
+  # Allow output to be limited to just certain Oses
   if $params['OS']
   
     host_os = host.os.name
@@ -398,7 +398,7 @@ def gen_output (host, port, srv,timestamp, script="")
     end # if host_os
   end
   
-  #Handle specifically excluded services
+  # Handle specifically excluded services
   if $params['Exclude']
 
     if srv.product
@@ -407,13 +407,13 @@ def gen_output (host, port, srv,timestamp, script="")
       exclude_result = true if portstring.include?($params['Exclude'])
     end # srv.product
 
-  end  #if $params['Exclude']
+  end  # if $params['Exclude']
     
 
-  #Stop processing output if this result was excluded for any reason
+  # Stop processing output if this result was excluded for any reason
   return if exclude_result
   
-  #Build output string
+  # Build output string
   if $params['Format_bare']
     result_string = "#{host.addr}"
   elsif $params['Format_csv']
@@ -449,17 +449,17 @@ def gen_output (host, port, srv,timestamp, script="")
     else
       if (port) and (srv)
         result_string = sprintf("%-15s %-30.30s %5d/%-3s %-12.12s %-20.20s %-10.10s %-30.30s %-19s",host.addr, host.hostname, port.num, port.proto, srv.name, srv.product, srv.version, srv.extra, timestamp)
-        #result_string = "#{host.addr}\t#{host.hostname}\t#{port.num}/#{port.proto}\t#{srv.name}\t#{srv.product}\t#{srv.version}\t#{srv.extra}\t#{timestamp}"
+        # result_string = "#{host.addr}\t#{host.hostname}\t#{port.num}/#{port.proto}\t#{srv.name}\t#{srv.product}\t#{srv.version}\t#{srv.extra}\t#{timestamp}"
       else
         result_string = sprintf("%-15s %-30.30s                                                                         %-19s",host.addr, host.hostname, timestamp)
-        #result_string = "#{host.addr}\t#{host.hostname}\t\t\t\t\t\t#{timestamp}"
+        # result_string = "#{host.addr}\t#{host.hostname}\t\t\t\t\t\t#{timestamp}"
       end
     end
   
   
   end  # $params['Format_bare']
   
-  #Write result to appropriate media      
+  # Write result to appropriate media      
   if $reportfile
     $reportfile.puts result_string
   else
@@ -493,17 +493,17 @@ def port_search (port_num)
   
       if $params['Start_date']
         scan_date = Date.parse(timestamp)
-        #skip this file if it is not in the date range we want
+        # skip this file if it is not in the date range we want
         next if scan_date < $params['Start_date']
       end
   
       if $params['End_date']
         scan_date = Date.parse(timestamp)
-        #skip this file if it is not in the date range we want
+        # skip this file if it is not in the date range we want
         next if scan_date > $params['End_date']
       end
   
-      parser.hosts("up") do |host|
+      parser.hosts('up') do |host|
 
         host.getports(:any,"open") do |port|
           if port.num == port_num
@@ -545,19 +545,19 @@ def service_search (service_string)
       
       if $params['Start_date']
         scan_date = Date.parse(timestamp)
-        #skip this file if it is not in the date range we want
+        # skip this file if it is not in the date range we want
         next if scan_date < $params['Start_date']
       end
   
       if $params['End_date']
         scan_date = Date.parse(timestamp)
-        #skip this file if it is not in the date range we want
+        # skip this file if it is not in the date range we want
         next if scan_date > $params['End_date']
       end
 
-      parser.hosts("up") do |host|
+      parser.hosts('up') do |host|
 
-        host.getports(:any,"open") do |port|
+        host.getports(:any, 'open') do |port|
           next if (port.state == 'open|filtered') and (port.reason == 'no-response')
           foundmatch = false
           srv = port.service
@@ -594,14 +594,14 @@ def service_search (service_string)
 
     end  # begin
   }
-  
+
 end  # service_search (service_string)
 
-def os_search (os_string)
+def os_search(os_string)
 
   foundmatch = nil
   host_os = nil
-  
+
   if $params['Format_csv']
     if $reportfile
       $reportfile.puts "IP address,hostname,os name,os family,os type,scan date"
@@ -609,38 +609,38 @@ def os_search (os_string)
       puts "IP address,hostname,os name,os family,os type,scan date"
     end
   end
-  
+
   $listing.each { |file|
     begin
       parser = Nmap::Parser.parsefile(file)
-    
+
     rescue Interrupt
       exit_interrupt
-    
+
     rescue
-    
+
       if $error_message
         $error_message = $error_message + "\r\n" + "Error parsing #{file}." + "\r\n"
       else
         $error_message = "Error parsing #{file}."
       end # $error_message
-    
+
     else
       timestamp = Time.at(parser.session.start_time).strftime("%Y/%m/%d %X")
       
       if $params['Start_date']
         scan_date = Date.parse(timestamp)
-        #skip this file if it is not in the date range we want
+        # skip this file if it is not in the date range we want
         next if scan_date < $params['Start_date']
       end
   
       if $params['End_date']
         scan_date = Date.parse(timestamp)
-        #skip this file if it is not in the date range we want
+        # skip this file if it is not in the date range we want
         next if scan_date > $params['End_date']
       end
 
-      parser.hosts("up") do |host|
+      parser.hosts('up') do |host|
       
         if $ip_filter
           if !$ip_filter.include?(IPAddr.new(host.ip4_addr))
@@ -663,7 +663,7 @@ def os_search (os_string)
         
         end
         
-        #Special case: excluded OS will be dropped from --all hosts output
+        # Special case: excluded OS will be dropped from --all hosts output
         if $params['Exclude_os']
 
           if host_os
@@ -685,7 +685,7 @@ def os_search (os_string)
           end  # $params['Format_bare']
 
 
-          #Write result to appropriate media      
+          # Write result to appropriate media      
           if $reportfile
             $reportfile.puts result_string
           else
@@ -703,9 +703,9 @@ def os_search (os_string)
     end  # begin
   }  # $listing.each
 
-end  # os_search (os_string)
+end  # os_search(os_string)
 
-def mac_search (mac_string)
+def mac_search(mac_string)
 
   foundmatch      = nil
   host_mac        = nil
@@ -750,7 +750,7 @@ def mac_search (mac_string)
         next if scan_date > $params['End_date']
       end
 
-      parser.hosts("up") do |host|
+      parser.hosts('up') do |host|
 
         if $ip_filter
           if !$ip_filter.include?(IPAddr.new(host.ip4_addr))
@@ -773,24 +773,24 @@ def mac_search (mac_string)
         end # if host_mac
 
 
-        #Check the script data for the MAC from nbtstat.nse
+        # Check the script data for the MAC from nbtstat.nse
         mac_regex = /NetBIOS MAC: (..:..:..:..:..:..) \((.*)\)/
         if !foundmatch
           host.scripts do |script|
             if script.id == 'nbstat'
               match = nil
               match = mac_regex.match(script.output)
-              #script_result = script.output.downcase
+              # script_result = script.output.downcase
               if (match)
                 host_mac = match[1].upcase if match[1]
                 host_mac_vendor = match[2] if match[2]
                 foundmatch = true
               end
             end
-          end  #host.scripts do |script|
-        end #!foundmatch
+          end  # host.scripts do |script|
+        end # !foundmatch
 
-        #Special case: excluded OS will be dropped from --all hosts output
+        # Special case: excluded OS will be dropped from --all hosts output
         if $params['Exclude_os']
 
           if host_os
@@ -810,7 +810,7 @@ def mac_search (mac_string)
             result_string = sprintf("%-15s %-40.40s %-17.17s %-20.20s %-19s", host.addr, host.hostname, host_mac, host_mac_vendor, timestamp)
           end  # $params['Format_bare']
 
-          #Write result to appropriate media      
+          # Write result to appropriate media      
           if $reportfile
             $reportfile.puts result_string
           else
@@ -858,17 +858,17 @@ def script_search (script_string)
 
       if $params['Start_date']
         scan_date = Date.parse(timestamp)
-        #skip this file if it is not in the date range we want
+        # skip this file if it is not in the date range we want
         next if scan_date < $params['Start_date']
       end
 
       if $params['End_date']
         scan_date = Date.parse(timestamp)
-        #skip this file if it is not in the date range we want
+        # skip this file if it is not in the date range we want
         next if scan_date > $params['End_date']
       end
 
-      parser.hosts("up") do |host|
+      parser.hosts('up') do |host|
 
         if $ip_filter
           if !$ip_filter.include?(IPAddr.new(host.ip4_addr))
@@ -877,25 +877,25 @@ def script_search (script_string)
         end
 
 
-        #Changes to deal with host level scripts
+        # Changes to deal with host level scripts
         host.scripts do |script|
           script_result = script.output.downcase
-          if (script_result.include? script_string) or (script.id.include? script_string)
-            gen_output host,"","",timestamp,script
+          if (script_result.include? script_string) || (script.id.include? script_string)
+            gen_output host, "", "", timestamp, script
           end
-        end  #port.scripts do |script|
+        end  # port.scripts do |script|
 
 
 
-        host.getports(:any,"open") do |port|
+        host.getports(:any, 'open') do |port|
           srv = port.service
 
           port.scripts do |script|
             script_result = script.output.downcase
-            if (script_result.include? script_string) or (script.id.include? script_string)
-              gen_output host,port,srv,timestamp,script  
+            if (script_result.include? script_string) || (script.id.include? script_string)
+              gen_output host, port, srv, timestamp, script  
             end
-          end  #port.scripts do |script|
+          end  # port.scripts do |script|
 
         end  # host.getports(:any,"open")
 
@@ -908,7 +908,7 @@ def script_search (script_string)
 
 end  # script_search (script_string)
 
-def statistics (counter)
+def statistics(counter)
 
   port_stats     = Hash.new(0)
   os_stats       = Hash.new(0)
@@ -938,18 +938,18 @@ def statistics (counter)
 
       if $params['Start_date']
         scan_date = Date.parse(timestamp)
-        #skip this file if it is not in the date range we want
+        # skip this file if it is not in the date range we want
         next if scan_date < $params['Start_date']
       end
   
       if $params['End_date']
         scan_date = Date.parse(timestamp)
-        #skip this file if it is not in the date range we want
+        # skip this file if it is not in the date range we want
         next if scan_date > $params['End_date']
       end
 
 
-      parser.hosts("up") do |host|
+      parser.hosts('up') do |host|
 
         if $ip_filter
           if !$ip_filter.include?(IPAddr.new(host.ip4_addr))
@@ -957,7 +957,7 @@ def statistics (counter)
           end
         end
 
-        #Allow output to be limited to just certain Oses
+        # Allow output to be limited to just certain Oses
         if $params['OS']
           host_os = host.os.name
           if host_os
@@ -970,11 +970,11 @@ def statistics (counter)
 
         host_counter = host_counter + 1
 
-        #Increment OS stats counter by 1
+        # Increment OS stats counter by 1
         os_stats["#{host.os.name}"] += 1
 
 
-        host.getports(:any,"open") do |port|
+        host.getports(:any, 'open') do |port|
 
           # Develop stats on ports
           port_stats["#{port.num}/#{port.proto}"] += 1
@@ -987,7 +987,7 @@ def statistics (counter)
 
         end  #host.getports(:any,"open") do |port|
 
-      end #parser.hosts("up") do |host|
+      end #parser.hosts('up') do |host|
 
     end
 
@@ -996,58 +996,57 @@ def statistics (counter)
   puts
   puts "The specified subset of logs contain information on #{host_counter} hosts."
   puts
-  puts "OS statistics:"
+  puts 'OS statistics:'
   puts
-  puts "Count  OS"
-  # Reverse sort the hash table (thats the -1 part), then iterate through the temporary
-  # array and display the results.
+  puts 'Count  OS'
+  # Reverse sort the hash table (thats the -1 part), then iterate through
+  # the temporary array and display the results.
 
   os_stats.sort {|a,b| -1*(a[1]<=>b[1])}.each_with_index { |item, index|
-    break if counter and index.to_i == counter
-    puts sprintf("%5d  %s ",item[1],item[0])
+    break if counter && index.to_i == counter
+    puts sprintf("%5d  %s ", item[1], item[0])
   }
 
-  
+
   puts
-  puts "Port statistics:"
+  puts 'Port statistics:'
   puts
-  puts "Count  Port"
-  # Reverse sort the hash table (thats the -1 part), then iterate through the temporary
-  # array and display the results.
+  puts 'Count  Port'
+  # Reverse sort the hash table (thats the -1 part), then iterate through
+  # the temporary array and display the results.
 
   port_stats.sort {|a,b| -1*(a[1]<=>b[1])}.each_with_index { |item, index|
-    break if counter and index.to_i == counter
-    puts sprintf("%5d  %s ",item[1],item[0])
+    break if counter && index.to_i == counter
+    puts sprintf("%5d  %s ", item[1], item[0])
   }
 
 
   puts
-  puts "Service statistics:"
+  puts 'Service statistics:'
   puts
-  puts "Count  Service"
-  # Reverse sort the hash table (thats the -1 part), then iterate through the temporary
-  # array and display the results.
+  puts 'Count  Service'
+  # Reverse sort the hash table (thats the -1 part), then iterate through
+  # the temporary array and display the results.
 
   service_stats.sort {|a,b| -1*(a[1]<=>b[1])}.each_with_index { |item, index|
-    break if counter and index.to_i == counter
-    puts sprintf("%5d  %s ",item[1],item[0])
+    break if counter && index.to_i == counter
+    puts sprintf("%5d  %s ", item[1], item[0])
   }
 
   puts
-  puts "Product statistics:"
+  puts 'Product statistics:'
   puts
-  puts "Count  Product"
-  # Reverse sort the hash table (thats the -1 part), then iterate through the temporary
-  # array and display the results.
+  puts 'Count  Product'
+  # Reverse sort the hash table (thats the -1 part), then iterate through
+  # the temporary array and display the results.
 
   product_stats.sort {|a,b| -1*(a[1]<=>b[1])}.each_with_index { |item, index|
-    break if counter and index.to_i == counter
-    puts sprintf("%5d  %s ",item[1],item[0])
+    break if counter && index.to_i == counter
+    puts sprintf("%5d  %s ", item[1], item[0])
   }
 
   puts
   puts
 
-end #statistics
-
+end # statistics
 }
