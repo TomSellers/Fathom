@@ -1,0 +1,2 @@
+# Exclusion file used by scan-full.sh and scan-noping-full.sh
+

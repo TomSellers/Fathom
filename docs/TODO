@@ -1,0 +1,38 @@
+fathom.rb
+
+	- Output: Sort result
+	- Deal with UDP port status of open|filtered, etc
+	- Deal with the new pre-script results intelligently, we cannot
+	       search them normally as quite bit of non-host or other host
+		   related info ends up here that would trash the search results.
+		   Sent email to list - http://seclists.org/nmap-dev/2010/q4/100
+	- Statistics - generate MAC statistics
+			
+fp-list.rb
+	
+	- Ouput Filter: Filter based on OS for service fingerprint output
+	
+util-cleanup.rb
+	- Removal filters
+		Date
+	- Change order of operations so that multiple command line parameters will
+	  have reasonable results
+	
+General
+
+	- Add ability to output filename in the results
+	- Added --host-timeout and other tuning options to scan scripts
+			Reference http://seclists.org/nmap-dev/2008/q4/805
+	
+Nmap::Parser
+
+
+Nmap
+
+	- nbstat.nse - see if nse script can set MAC address value of host object
+		If so, update script
+		
+	- Only the scanned IP address is listed in the XML and gnmap output.
+		Research adding all IP addresses to the XML output
+
+	- Add excluded hosts to the XML and flag appropriately
