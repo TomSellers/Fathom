@@ -1,0 +1,2 @@
+The purpose of this directory is to house the results of Nmap scans. The backup
+directory below is used for archived copies of scan data before it is destroyed.
