@@ -1,6 +1,6 @@
 #!/bin/bash
 #  
-#  report.sh v0.97
+#  report.sh v0.98
 #
 #  Output standard nmap scan results from the .nmap file in the ./logs/ dir
 #
@@ -13,5 +13,5 @@
 #
 #				
 
-cat ./logs/$1.nmap
+cat "./logs/$1.nmap"
 

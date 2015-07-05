@@ -13,10 +13,16 @@
 #				www.nmap.org
 #
 
+rm ./lists/update_temp.txt
+
+echo Generating list...
 for f in $(ls -tr ./logs/*.xml); do
 	f=${f#./logs/}		#strip off ./logs/
 	f=${f%%.xml} 		#strip off the .xml filename extension
-        echo "$(date)" "Processing $f"
-	./scan-full.sh "$f"
+	echo "$f" >> ./lists/update_temp.txt
 done
+
+echo List complete..
+
+xargs --arg-file=./lists/update_temp.txt --max-procs=3 -I IP ./scan-full.sh IP
 

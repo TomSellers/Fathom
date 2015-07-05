@@ -1,6 +1,6 @@
 #!/bin/bash
 #  
-#  sweep-full.sh v0.97
+#  sweep-full.sh v0.98
 #
 #  The purpose of this script is to peform a full (intensive) scan against a list of hosts.
 #  Input is a file (./lists/scanlist-random.txt) containing a list of IP addresses.  
@@ -13,7 +13,7 @@
 #				www.nmap.org
 #
 
-for ip in `cat ./lists/scanlist-random.txt`; do 
-	echo `date "+%x %X"` Scanning $ip;
-	./scan-full.sh $ip;
+for ip in $(cat ./lists/scanlist-random.txt); do 
+	echo "$(date "+%x %X")" Scanning "$ip";
+	./scan-full.sh "$ip";
 done

@@ -1,0 +1,48 @@
+# Ignore any data in the /logs directory 
+logs/*
+logs/backup/*
+
+lists/update_temp.txt
+
+# Don't ignore directories themselves
+!*/
+
+
+# Don't ignore .gitignore
+!.gitignore
+
+# Rubymine project directory
+.idea
+
+# Sublime Text project directory (not created by ST by default)
+.sublime-project
+
+# RVM control file
+.rvmrc
+
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
+
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+
+# Misc backup files
+*~
+
+
+# KDE directory preferences
+.directory
+
+# Linux trash folder which might appear on any partition or disk
+.Trash-*

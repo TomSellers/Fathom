@@ -1,6 +1,6 @@
 #!/bin/bash
 #  
-#  scan-recon.sh v0.97
+#  scan-recon.sh v0.98
 #
 #  Perform nmap port scan on all TCP ports and a subset of UDP ports, 
 #  **NO** scripts are run and **NO** version detection is performed.  
@@ -13,5 +13,5 @@
 #				www.nmap.org
 #	
 
-nmap -sSU -O -pT:-,U:161,162,1434,1900  --host-timeout 10m --open --excludefile ./lists/excludes-recon.txt -R --webxml -oA ./logs/$1 $1 > ./logs/$1.txt 2> ./logs/$1.err
+nmap -sSU -O -pT:-,U:161,162,1434,1900  --host-timeout 10m --open --excludefile ./lists/excludes-recon.txt -R --webxml -oA "./logs/$1" "$1" > "./logs/$1.txt" 2> "./logs/$1.err"
 

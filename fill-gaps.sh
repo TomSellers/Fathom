@@ -1,6 +1,6 @@
 #!/bin/bash
 #  
-#  fill-gaps.sh v0.97
+#  fill-gaps.sh v0.98
 #
 #  Input is a file (./lists/gaps.txt) containing a list of IP addresses.  
 #  The script scans runs scan-recon.sh against the address ONLY if there 
@@ -13,13 +13,13 @@
 #				www.nmap.org
 #
 
-for ip in `cat ./lists/gaps.txt`; do
-	if [ -f ./logs/$ip.xml ];
+for ip in $(cat ./lists/gaps.txt); do
+	if [ -f "./logs/$ip.xml" ];
 	then
-	   echo `date "+%x %X"` Record exists for $ip;
+	   echo "$(date "+%x %X")" Record exists for "$ip";
 	else
-	   echo `date "+%x %X"` Scanning $ip;
-           ./scan-recon.sh $ip;
+	   echo "$(date "+%x %X")" Scanning "$ip";
+           ./scan-recon.sh "$ip";
 	fi
 done
 

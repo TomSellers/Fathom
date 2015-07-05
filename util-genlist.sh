@@ -1,6 +1,6 @@
 #!/bin/bash
 #  
-#  util-genlist.sh v0.97
+#  util-genlist.sh v0.98
 #
 #  Take input from a text file and use it to build two lists containing all of the IP addresses, with duplicates removed, one per line.
 #  One of the lists is sorted, the other randomized.
