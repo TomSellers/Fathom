@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-#  
+# 
 #  fathom.rb
 #
 #  Searches nmap XML output for port, service, script output or OS
@@ -50,7 +50,7 @@ $reportfile = nil
 begin 
   $error_message = nil
   $params = ParseArgs.parse(ARGV)
-  
+
   # Set the XML location to the default if one is not specified on the command line
   if !$listing
     if File.directory?($log_path)
@@ -63,22 +63,22 @@ begin
       exit
     end
   end
-  
+
   #Sort the file list, it won't sort the IPs properly but it is better than
   #the scattershot listing before.
   $listing.sort!
-  
+
   if $params['Report_File']
     $reportfile = File.new($params['Report_File'], "w")
   end
-      
+
   if $params['Metrics']
     statistics $params['Metric_counter']
     exit
   end
-  
+
   if ($params['Port'])
-    
+
     puts
     if $params['Format_csv']
       if $reportfile
@@ -89,14 +89,14 @@ begin
     end
 
     port_search $params['Port']
-        
+
     #Exit cleanly
     exit_normal
-    
+
   end 
 
   if ($params['Service'])
-      
+
     puts
     if $params['Format_csv']
       if $reportfile
@@ -105,7 +105,7 @@ begin
         puts "IP address,hostname,port,service,product,version,extra info,scan date"
       end 
     end
-    
+
     service_search $params['Service']
   end
 
@@ -113,23 +113,23 @@ begin
     puts
     os_search $params['OS']
   end
-  
+
   if ($params['MAC'])
     puts
     mac_search $params['MAC']
   end
-  
+
   if ($params['Script_data'])
     script_search $params['Script_data']
   end
 
   #Exit cleanly
   exit_normal
-  
+
 rescue Interrupt
   exit_interrupt
-  
- 
+
+
 end
 
 ########################################################
@@ -139,10 +139,10 @@ end
 BEGIN  {
 
 class ParseArgs
-  
+
   def self.parse(args)
     options = {}
-    
+
     legal_option = nil
 
     opts = OptionParser.new do |opts|
@@ -150,7 +150,7 @@ class ParseArgs
 
       opts.separator ""
       opts.separator "Query options:"
-      
+
       opts.on("-p", "--port <number>", "Search for specified port number") do |p|
         options['Port'] = p.to_i
         legal_option = true
@@ -160,25 +160,25 @@ class ParseArgs
         options['Service'] = s.downcase
         legal_option = true
       end
-      
+
       opts.on("-o", "--operating-system <string>", "Search for specified OS string") do |o|
         options['OS'] = o.downcase
         legal_option = true
       end
-      
+
       opts.on("-m", "--mac-address <string>", "Search for specified MAC address or vendor string") do |m|
         options['MAC'] = m.downcase
         legal_option = true
       end
-      
+
       opts.on("-a", "--all-hosts", "Return a list of all hosts in the logs") do |o|
         options['All'] = true
         legal_option = true
       end
-      
+
       opts.separator ""
       opts.separator "Filter options:"
-      
+
       opts.on("--ip-filter <ip_address>", "Filter results by IP Address",
                                           "Acceptable formats are as a single IP address   (xxx.xxx.xxx.xxx)",
                         "or in IP/CIDR notation                          (xxx.xxx.xxx.xxx/xx)",
@@ -187,13 +187,13 @@ class ParseArgs
         # validate ip filter
         # check for format xxx.xxx.xxx.xxx
         valid_filter = true if (address_filter.to_s =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/)
-        
+
         # check for format xxx.xxx.xxx.xxx/xx
         valid_filter = true if (address_filter.to_s =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$/)
-        
+
         # check for format xxx.xxx.xxx.xxx/xxx.xxx.xxx.xxx (netmask)
         valid_filter = true if (address_filter.to_s =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/)
-                
+
         if valid_filter
           $ip_filter = IPAddr.new address_filter.to_s
         else
@@ -203,7 +203,7 @@ class ParseArgs
           exit
         end # if valid_filter
       end
-      
+
       opts.on("--start-date <YYYY-MM-DD>", "Limit output to hosts scanned ON or AFTER the specified date, valid delimiters are . / and -") do |start_date|
         if (start_date.to_s =~ /^\d{4}[.\/-]\d{1,2}[.\/-]\d{1,2}$/)
           options['Start_date'] = Date.parse($&)
@@ -214,7 +214,7 @@ class ParseArgs
           exit
         end        
       end
-      
+
       opts.on("--end-date <YYYY-MM-DD>", "Limit output to hosts scanned ON or BEFORE the specified date, valid delimiters are . / and -") do |end_date|
         if (end_date.to_s =~ /^\d{4}[.\/-]\d{1,2}[.\/-]\d{1,2}$/)
           options['End_date'] = Date.parse($&)
@@ -223,24 +223,24 @@ class ParseArgs
           puts "Error: Option passed for end date does not appear valid. Use -h to see valid formats."
           puts
           exit
-        end        
+        end
       end
-      
+
       opts.on("-e", "--exclude-port <number>", "Exclude results matching the specified port") do |e|
         options['Exclude_port'] = e.to_i
       end
-      
+
       opts.on("-x", "--exclude-service <string>", "Exclude service where the service name or product matches the specified string") do |x|
         options['Exclude'] = x.downcase
-      end      
-      
+      end
+
       opts.on("--exclude-os <string>", "Exclude results matching the specified OS (if the OS is identified by Nmap)") do |exclude_os|
         options['Exclude_os'] = exclude_os.downcase
       end
-      
+
       opts.separator ""
       opts.separator "Misc options:"
-      
+
       opts.on("-l", "--log <location>", "Specify a particular Nmap XML file or the location of the directory containing Nmap XML logs") do |l|
         if ( File.directory?(l) && File.readable?(l) )
           $log_path = l
@@ -253,7 +253,7 @@ class ParseArgs
           exit
         end
       end    
-    
+
       opts.on("-r", "--report <filename>", "Output results to specified file, as opposed to the terminal") do |r|
         if File.exist?(r)
           if !File.writable?(r)
@@ -263,19 +263,19 @@ class ParseArgs
             exit
           end
         end
-        
+
         options['Report_File'] = r.to_s
-                      
+            
       end
-      
+
       opts.on("-b", "--bare", "Output IP Address only") do
         options['Format_bare'] = true
       end
-      
+
       opts.on("-c", "--csv", "Output results in CSV format") do
         options['Format_csv'] = true
       end
-      
+
       opts.on("--metrics [number]", "Generate OS and port statistics, optionally limit result count") do |count|
         if count.to_i > 0
           options['Metric_counter'] = count.to_i 
@@ -290,9 +290,9 @@ class ParseArgs
         options['Script_data'] = script_data.downcase
         legal_option = true
       end  
-      
+
       opts.separator ""
-      
+
       opts.on("-v", "--version", "Show version information") do
         puts
         puts "\tfathom #{Prog_version} by Tom Sellers"
@@ -671,10 +671,10 @@ def os_search (os_string)
             foundmatch = false if host_os.include?($params['Exclude_os'])
           end
         end
-        
-                
+
+    
         if foundmatch
-  
+
           if $params['Format_bare']
             result_string = "#{host.addr}"
           elsif $params['Format_csv']
@@ -683,8 +683,8 @@ def os_search (os_string)
             result_string = sprintf("%-15s %-40.40s %-30.30s %-12.12s %-17.17s %-19s", host.addr, host.hostname, host.os.name, host.os.osfamily, host.os.ostype, timestamp)
             #result_string = "#{host.addr}\t#{host.hostname}\t#{host.os.name}\t#{host.os.osfamily}\t#{host.os.ostype}\t#{timestamp}"
           end  # $params['Format_bare']
-          
-          
+
+
           #Write result to appropriate media      
           if $reportfile
             $reportfile.puts result_string
@@ -693,13 +693,13 @@ def os_search (os_string)
           end # $reportfile
   
           result_string = nil  
-                    
+
         end  # if foundmatch
-                
+
       end  # parser.host..
-  
+
       timestamp = nil
-  
+
     end  # begin
   }  # $listing.each
 
@@ -710,8 +710,8 @@ def mac_search (mac_string)
   foundmatch      = nil
   host_mac        = nil
   host_mac_vendor = nil
-  
-  
+
+
   if $params['Format_csv']
     if $reportfile
       $reportfile.puts "IP address,hostname,mac address,mac vendor,scan date"
@@ -719,31 +719,31 @@ def mac_search (mac_string)
       puts "IP address,hostname,mac address,mac vendor,scan date"
     end
   end
-  
+
   $listing.each { |file|
     begin
       parser = Nmap::Parser.parsefile(file)
-    
+
     rescue Interrupt
       exit_interrupt
-    
+
     rescue
-    
+
       if $error_message
         $error_message = $error_message + "\r\n" + "Error parsing #{file}." + "\r\n"
       else
         $error_message = "Error parsing #{file}."
       end # $error_message
-    
+
     else
       timestamp = Time.at(parser.session.start_time).strftime("%Y/%m/%d %X")
-      
+
       if $params['Start_date']
         scan_date = Date.parse(timestamp)
         #skip this file if it is not in the date range we want
         next if scan_date < $params['Start_date']
       end
-  
+
       if $params['End_date']
         scan_date = Date.parse(timestamp)
         #skip this file if it is not in the date range we want
@@ -751,16 +751,16 @@ def mac_search (mac_string)
       end
 
       parser.hosts("up") do |host|
-      
+
         if $ip_filter
           if !$ip_filter.include?(IPAddr.new(host.ip4_addr))
             next
           end
         end
-        
-        
+
+
         foundmatch = false 
-        
+
         if host.mac_addr
           host_mac = host.mac_addr.upcase
           foundmatch = true if host_mac.downcase.include?(mac_string)
@@ -771,8 +771,8 @@ def mac_search (mac_string)
           host_mac_vendor = host.mac_vendor
           foundmatch = true if host_mac_vendor.downcase.include?(mac_string)
         end # if host_mac
-          
-    
+
+
         #Check the script data for the MAC from nbtstat.nse
         mac_regex = /NetBIOS MAC: (..:..:..:..:..:..) \((.*)\)/
         if !foundmatch
@@ -789,7 +789,7 @@ def mac_search (mac_string)
             end
           end  #host.scripts do |script|
         end #!foundmatch
-        
+
         #Special case: excluded OS will be dropped from --all hosts output
         if $params['Exclude_os']
 
@@ -798,10 +798,10 @@ def mac_search (mac_string)
             foundmatch = false if host_os.include?($params['Exclude_os'])
           end
         end
-        
-                
+
+
         if foundmatch
-  
+
           if $params['Format_bare']
             result_string = "#{host.addr}"
           elsif $params['Format_csv']
@@ -809,23 +809,22 @@ def mac_search (mac_string)
           else
             result_string = sprintf("%-15s %-40.40s %-17.17s %-20.20s %-19s", host.addr, host.hostname, host_mac, host_mac_vendor, timestamp)
           end  # $params['Format_bare']
-          
-          
+
           #Write result to appropriate media      
           if $reportfile
             $reportfile.puts result_string
           else
             puts result_string
           end # $reportfile
-  
+
           result_string = nil  
-                    
+
         end  # if foundmatch
-                
+
       end  # parser.host..
-  
+
       timestamp = nil
-  
+
     end  # begin
   }  # $listing.each
 
@@ -837,47 +836,47 @@ def script_search (script_string)
   if $params['Format_csv']
     puts "IP address,hostname,port,service,product,version,extra info,script name,scan date"
   end
-  
+
   $listing.each { |file|
-        
+
     begin
       parser = Nmap::Parser.parsefile(file)
-      
+
     rescue Interrupt
       exit_interrupt
-    
+
     rescue
-      
+
       if $error_message
         $error_message = $error_message + "\r\n" + "Error parsing #{file}." + "\r\n"
       else
         $error_message = "Error parsing #{file}."
       end # $error_message
-      
+
     else
       timestamp = Time.at(parser.session.start_time).strftime("%Y/%m/%d %X")
-      
+
       if $params['Start_date']
         scan_date = Date.parse(timestamp)
         #skip this file if it is not in the date range we want
         next if scan_date < $params['Start_date']
       end
-  
+
       if $params['End_date']
         scan_date = Date.parse(timestamp)
         #skip this file if it is not in the date range we want
         next if scan_date > $params['End_date']
       end
-          
+
       parser.hosts("up") do |host|
-      
+
         if $ip_filter
           if !$ip_filter.include?(IPAddr.new(host.ip4_addr))
             next
           end
         end
 
-        
+
         #Changes to deal with host level scripts
         host.scripts do |script|
           script_result = script.output.downcase
@@ -890,53 +889,53 @@ def script_search (script_string)
 
         host.getports(:any,"open") do |port|
           srv = port.service
-          
+
           port.scripts do |script|
             script_result = script.output.downcase
             if (script_result.include? script_string) or (script.id.include? script_string)
               gen_output host,port,srv,timestamp,script  
             end
           end  #port.scripts do |script|
-            
+
         end  # host.getports(:any,"open")
 
       end  # parser.host..
-  
+
       timestamp = nil
 
     end  # begin
   }
-  
+
 end  # script_search (script_string)
 
 def statistics (counter)
 
   port_stats     = Hash.new(0)
-  os_stats     = Hash.new(0)
-  service_stats   = Hash.new(0)
-  product_stats   = Hash.new(0)
+  os_stats       = Hash.new(0)
+  service_stats  = Hash.new(0)
+  product_stats  = Hash.new(0)
   host_counter   = 0
-  
+
   $listing.each { |file|
-        
+
     begin
       parser = Nmap::Parser.parsefile(file)
-    
+
     rescue Interrupt
       exit_interrupt
-    
+
     rescue
-      
+
       if $error_message
         $error_message = $error_message + "\r\n" + "Error parsing #{file}." + "\r\n"
       else
         $error_message = "Error parsing #{file}."
       end # $error_message
-      
+
     else
-    
+
       timestamp = Time.at(parser.session.start_time).strftime("%Y/%m/%d %X")
-      
+
       if $params['Start_date']
         scan_date = Date.parse(timestamp)
         #skip this file if it is not in the date range we want
@@ -948,16 +947,16 @@ def statistics (counter)
         #skip this file if it is not in the date range we want
         next if scan_date > $params['End_date']
       end
-    
-    
+
+
       parser.hosts("up") do |host|
-      
+
         if $ip_filter
           if !$ip_filter.include?(IPAddr.new(host.ip4_addr))
             next
           end
         end
-        
+
         #Allow output to be limited to just certain Oses
         if $params['OS']
           host_os = host.os.name
@@ -970,24 +969,24 @@ def statistics (counter)
         end
 
         host_counter = host_counter + 1
-        
+
         #Increment OS stats counter by 1
         os_stats["#{host.os.name}"] += 1
-                
-      
+
+
         host.getports(:any,"open") do |port|
-        
+
           # Develop stats on ports
           port_stats["#{port.num}/#{port.proto}"] += 1
-                        
+
           # Develop stats on port service field
           service_stats["#{port.service.name}"] += 1
 
           # Develop stats on port service product field
           product_stats["#{port.service.product}"]+= 1
-        
+
         end  #host.getports(:any,"open") do |port|
-      
+
       end #parser.hosts("up") do |host|
 
     end
@@ -1002,7 +1001,7 @@ def statistics (counter)
   puts "Count  OS"
   # Reverse sort the hash table (thats the -1 part), then iterate through the temporary
   # array and display the results.
-  
+
   os_stats.sort {|a,b| -1*(a[1]<=>b[1])}.each_with_index { |item, index|
     break if counter and index.to_i == counter
     puts sprintf("%5d  %s ",item[1],item[0])
@@ -1015,24 +1014,24 @@ def statistics (counter)
   puts "Count  Port"
   # Reverse sort the hash table (thats the -1 part), then iterate through the temporary
   # array and display the results.
-  
+
   port_stats.sort {|a,b| -1*(a[1]<=>b[1])}.each_with_index { |item, index|
     break if counter and index.to_i == counter
     puts sprintf("%5d  %s ",item[1],item[0])
-  }  
+  }
 
-  
+
   puts
   puts "Service statistics:"
   puts
   puts "Count  Service"
   # Reverse sort the hash table (thats the -1 part), then iterate through the temporary
   # array and display the results.
-  
+
   service_stats.sort {|a,b| -1*(a[1]<=>b[1])}.each_with_index { |item, index|
     break if counter and index.to_i == counter
     puts sprintf("%5d  %s ",item[1],item[0])
-  }  
+  }
 
   puts
   puts "Product statistics:"
@@ -1040,15 +1039,15 @@ def statistics (counter)
   puts "Count  Product"
   # Reverse sort the hash table (thats the -1 part), then iterate through the temporary
   # array and display the results.
-  
+
   product_stats.sort {|a,b| -1*(a[1]<=>b[1])}.each_with_index { |item, index|
     break if counter and index.to_i == counter
     puts sprintf("%5d  %s ",item[1],item[0])
   }
-  
+
   puts
   puts
-  
+
 end #statistics
 
 }
