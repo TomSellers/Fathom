@@ -350,13 +350,13 @@ class SSLPort
     @svcversion   = ssl_port.service.version
     @timestamp    = timestamp
     
-    expire_regex = /Not valid after:  (\d{4}-\d{2}-\d{2}T\d\d:\d\d:\d\d\+\d\d:\d\d)/
+    expire_regex = /Not valid after:  (\d{4}-\d{2}-\d{2}T\d\d:\d\d:\d\d)/
     match = expire_regex.match(ssl_port.script('ssl-cert').output)
     if match
       @expire = Date.parse(match[1])
     end
 
-    created_regex = /Not valid before: (\d{4}-\d{2}-\d{2}T\d\d:\d\d:\d\d\+\d\d:\d\d)/
+    created_regex = /Not valid before: (\d{4}-\d{2}-\d{2}T\d\d:\d\d:\d\d)/
     match = created_regex.match(ssl_port.script('ssl-cert').output)
     if match
       @created = Date.parse(match[1])
