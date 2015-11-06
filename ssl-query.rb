@@ -35,7 +35,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-Prog_version = '0.98'
+Prog_version = '0.98.01'
 
 require 'nmap/parser'
 require 'optparse'
