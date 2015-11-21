@@ -101,6 +101,7 @@ class ParseArgs
     options = {}
 
     legal_option = false
+    options['Cert_Search'] = false
 
     opts = OptionParser.new do |opts|
       opts.banner = 'Usage: ssl-query.rb [options]'
@@ -110,32 +111,47 @@ class ParseArgs
 
       opts.on('-p', '--port <number>', 'Search for specified port number') do |p|
         options['Port'] = p.to_i
+        legal_option = true
       end
 
-      opts.on('-k', '--key-size <number>', 'Search for SSL certs with a specific key size.') do |k|
+      opts.on('-k', '--key-size <number>', 'Search for TLS certs with a specific key size.') do |k|
         options['Key'] = k.to_i
+        options['Cert_Search'] = true
+        legal_option = true
       end
 
-      opts.on('--key-max <number>', 'Search for SSL certs with the specified size or SMALLER') do |key_max|
+      opts.on('--key-max <number>', 'Search for TLS certs with the specified size or SMALLER') do |key_max|
         options['KeyMax'] = key_max.to_i
+        options['Cert_Search'] = true
+        legal_option = true
       end
 
-      opts.on('--key-min <number>', 'Search for SSL certs with the specified size or LARGER') do |key_min|
+      opts.on('--key-min <number>', 'Search for TLS certs with the specified size or LARGER') do |key_min|
         options['KeyMin'] = key_min.to_i
+        options['Cert_Search'] = true
+        legal_option = true
       end
 
-      opts.on('--ssl-expired', 'Show only services where the SSL certificate has expired.') do
+      opts.on('--ssl-expired', 'Show only services where the TLS certificate has expired.') do
         options['ssl_expired'] = true
+        options['Cert_Search'] = true
       end
 
       opts.on('-s', '--service <string>', '*Search service, product and information fields for the specified string') do |s|
         options['Service'] = s.downcase
+        legal_option = true
       end
 
       opts.on('-o', '--operating-system <string>', 'Search for specified OS string') do |o|
         options['OS'] = o.downcase
+        legal_option = true
       end
 
+      opts.on('--sig-algo <string>', 'Search for TLS certs signed with a certain signature algorithm') do |sig_algo|
+        options['Sigalgo'] = sig_algo.to_s.downcase
+        options['Cert_Search'] = true
+        legal_option = true
+      end
 
       opts.on('--all-ports', 'Return a list of all open ports in the logs') do
         options['All_Ports'] = true
@@ -144,11 +160,6 @@ class ParseArgs
 
       opts.separator ''
       opts.separator 'Filter options:'
-
-      opts.on('--ssl-expired', 'Show only services where the SSL certificate has expired.') do
-        options['ssl_expired'] = true
-        options['ssl_only'] = true
-      end
 
       opts.on('--ip-filter <ip_address>', 'Filter results by IP Address',
               'Acceptable formats are as a single IP address   (xxx.xxx.xxx.xxx)',
@@ -348,33 +359,35 @@ class SSLPort
     @svcversion   = ssl_port.service.version
     @timestamp    = timestamp
 
-    expire_regex = /Not valid after:  (\d{4}-\d{2}-\d{2}T\d\d:\d\d:\d\d)/
-    match = expire_regex.match(ssl_port.script('ssl-cert').output)
-    @expire = Date.parse(match[1]) if match
+    if ssl_port.script('ssl-cert') && ssl_port.script('ssl-cert').output
+      expire_regex = /Not valid after:  (\d{4}-\d{2}-\d{2}T\d\d:\d\d:\d\d)/
+      match = expire_regex.match(ssl_port.script('ssl-cert').output)
+      @expire = Date.parse(match[1]) if match
 
-    created_regex = /Not valid before: (\d{4}-\d{2}-\d{2}T\d\d:\d\d:\d\d)/
-    match = created_regex.match(ssl_port.script('ssl-cert').output)
-    @created = Date.parse(match[1]) if match
+      created_regex = /Not valid before: (\d{4}-\d{2}-\d{2}T\d\d:\d\d:\d\d)/
+      match = created_regex.match(ssl_port.script('ssl-cert').output)
+      @created = Date.parse(match[1]) if match
 
-    type_regex = /Public Key type: (\w{1,5})/
-    match = type_regex.match(ssl_port.script('ssl-cert').output)
-    @type = match[1].upcase if match
+      type_regex = /Public Key type: (\w{1,5})/
+      match = type_regex.match(ssl_port.script('ssl-cert').output)
+      @type = match[1].upcase if match
 
-    bits_regex = /Public Key bits: (\w{1,5})/
-    match = bits_regex.match(ssl_port.script('ssl-cert').output)
-    @bits = match[1].to_i if match
+      bits_regex = /Public Key bits: (\w{1,5})/
+      match = bits_regex.match(ssl_port.script('ssl-cert').output)
+      @bits = match[1].to_i if match
 
-    issuer_regex = /Issuer: commonName=([^\/\n]*)/
-    match = issuer_regex.match(ssl_port.script('ssl-cert').output)
-    @issuer = match[1] if match
+      issuer_regex = /Issuer: commonName=([^\/\n]*)/
+      match = issuer_regex.match(ssl_port.script('ssl-cert').output)
+      @issuer = match[1] if match
 
-    subject_regex = /Subject: commonName=([^\/\n]*)/
-    match = subject_regex.match(ssl_port.script('ssl-cert').output)
-    @subject = match[1] if match
+      subject_regex = /Subject: commonName=([^\/\n]*)/
+      match = subject_regex.match(ssl_port.script('ssl-cert').output)
+      @subject = match[1] if match
 
-    sigalgo_regex = /Signature Algorithm: ([^\n]*)/
-    match = sigalgo_regex.match(ssl_port.script('ssl-cert').output)
-    @sigalgo = match[1] if match
+      sigalgo_regex = /Signature Algorithm: ([^\n]*)/
+      match = sigalgo_regex.match(ssl_port.script('ssl-cert').output)
+      @sigalgo = match[1] if match
+    end
 
   end
 
@@ -399,7 +412,7 @@ def gen_output
     puts "#{port.addr},#{port.hostname},#{port.num}/#{port.proto},#{port.tunnel}/#{port.svcname},\"#{port.svcproduct}\",\"#{port.svcversion}\",#{port.bits},#{port.type},#{port.created},#{port.expire},\"#{port.subject}\",\"#{port.issuer}\",#{port.sigalgo},#{port.timestamp}"
   }
  # $Results.each {|sslport| puts "#{sslport.addr},#{sslport.timestamp}" }
-  puts "Total output hosts:  #{counter}"
+  puts "\r\nTotal output hosts:  #{counter}"
   endtime = Time.now - $starttime
   puts "Runtime #{endtime}"
 end
@@ -417,7 +430,7 @@ def port_search(port_num)
     rescue
 
       if $error_message
-        $error_message = $error_message + "\r\n" + "Error parsing #{file}."
+        $error_message = $error_message + "\r\nError parsing #{file}."
       else
         $error_message = "Error parsing #{file}."
       end # $error_message
@@ -454,7 +467,9 @@ def port_search(port_num)
         end
 
         host.getports(:any, 'open') do |port|
+          next unless (port.num == port_num || $params['All_Ports'])
           next if (port.state == 'open|filtered') && (port.reason == 'no-response')
+
           # Port level filtering here
           if $params['Exclude_port']
             if port.num
@@ -512,13 +527,12 @@ def port_search(port_num)
 
             end
 
+            if port.script('ssl-cert')
+              ssl_service = SSLPort.new(host, port, timestamp)
 
-            if (port.num == port_num) || ($params['All_Ports'])
-              if port.script('ssl-cert')
-                ssl_service = SSLPort.new(host, port, timestamp)
-
-                # SSL level filtering here
-
+              # SSL level filtering here
+              if $params['Cert_Search']
+              
                 # Key bits filtering
                 if ssl_service.bits
                   if $params['Key']
@@ -535,17 +549,32 @@ def port_search(port_num)
                 end
 
                 # Cert date filtering
-                if ssl_service.expire
-                  if $params['ssl_expired']
+                if $params['ssl_expired']
+                  if ssl_service.expire
                     next unless ssl_service.expire < $now
                   end
-
                 end
 
-                $Results.push(ssl_service)
+                # Signature algo filtering
+                if $params['Sigalgo']
+                  if ssl_service.sigalgo
+                    next unless ssl_service.sigalgo.downcase == $params['Sigalgo']
+                  end
+                end
+                
+              end # $params['Cert_Search']
 
+              # Report anything that makes it this far
+              $Results.push(ssl_service)
+
+            else
+              # Build out a valid object for services without certificate data
+              unless $params['Cert_Search']
+                ssl_service = SSLPort.new(host, port, timestamp)
+                $Results.push(ssl_service)
               end
-            end
+            end # port.script...
+          
           end
 
         end  # host.getports

@@ -1,8 +1,11 @@
 0.98.01 2015.11.20
 
+    Search:  ssl-query.rb - add ability to search based on the certificate's signature algorithm 
+    
 		Cleanup: Code cleanup in fathom.rb and ssl-query.rb
 
-		BUG: Fixed broken port exclusion switch ( -e )
+		BUG: fathom.rb - Fixed broken port exclusion switch ( -e )
+    BUG: ssl-query.rb - Fixed broken port selection logic
     BUG: Fixed handling of UDP open|filtered ports
 
 
