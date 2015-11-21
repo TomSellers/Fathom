@@ -1,6 +1,6 @@
 #!/bin/bash
 #  
-#  update-data.sh v0.98
+#  update-data.sh v0.98.01
 #
 #  Cycle through log directory and rescan each hosts, starting with the oldest first.
 #  The script runs scan-full.sh against each address.

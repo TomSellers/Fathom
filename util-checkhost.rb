@@ -35,7 +35,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-Prog_version = '0.98'
+PROG_VERSION = '0.98.01'
 
 require 'nmap/parser'
 require 'optparse'
@@ -110,7 +110,7 @@ class ParseArgs
 
                         opts.on("-v", "--version", "Show version information") do
                                 puts
-                                puts "\tutil-cleanup #{Prog_version} by Tom Sellers"
+                                puts "\tutil-cleanup #{PROG_VERSION} by Tom Sellers"
                                 puts
                                 puts "\tSupporting software versions:"
                                 puts "\t\tRuby version:          #{RUBY_VERSION}"

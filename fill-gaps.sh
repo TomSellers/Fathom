@@ -1,6 +1,6 @@
 #!/bin/bash
 #  
-#  fill-gaps.sh v0.98
+#  fill-gaps.sh v0.98.01
 #
 #  Input is a file (./lists/gaps.txt) containing a list of IP addresses.  
 #  The script scans runs scan-recon.sh against the address ONLY if there 
