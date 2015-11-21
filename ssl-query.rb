@@ -35,53 +35,53 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-Prog_version = '0.98.01'
+PROG_VERSION = '0.98.01'
 
 require 'nmap/parser'
 require 'optparse'
 require 'ipaddr'
 require 'date'
 
-$log_path = "./logs"
+$log_path = './logs'
 
 $ip_filter = nil
 $reportfile = nil
 $Results = Array.new
 $starttime = Time.now
-$now = Date.parse(Time.now.strftime("%Y/%m/%d %X"))
+$now = Date.parse(Time.now.strftime('%Y/%m/%d %X'))
 
 begin
   $error_message = nil
   $params = ParseArgs.parse(ARGV)
 
   # Set the XML location to the default if one is not specified on the command line
-  if !$listing
+  unless $listing
     if File.directory?($log_path)
       $listing = Dir.glob("#{$log_path}/*.xml")
     else
       puts
       puts "Error: Default log directory ( #{$log_path} ) does not exist or cannot be accessed."
-      puts "       Use -l or --log <location> to specify a Nmap XML file or directory containing the XML files"
+      puts '       Use -l or --log <location> to specify a Nmap XML file or directory containing the XML files'
       puts
       exit
     end
   end
 
-  #Sort the file list, it won't sort the IPs properly but it is better than
-  #the scattershot listing before.
+  # Sort the file list, it won't sort the IPs properly but it is better than
+  # the scattershot listing before.
   $listing.sort!
 
-  if ($params['Port'])
+  if $params['Port']
 
     puts
     port_search $params['Port']
 
-    #Exit cleanly
+    # Exit cleanly
     exit_normal
 
   end
 
-  #Exit cleanly
+  # Exit cleanly
   exit_normal
 
 rescue Interrupt
@@ -103,121 +103,121 @@ class ParseArgs
     legal_option = false
 
     opts = OptionParser.new do |opts|
-      opts.banner = "Usage: ssl-query.rb [options]"
+      opts.banner = 'Usage: ssl-query.rb [options]'
 
-      opts.separator ""
-      opts.separator "Query options:"
+      opts.separator ''
+      opts.separator 'Query options:'
 
-      opts.on("-p", "--port <number>", "Search for specified port number") do |p|
+      opts.on('-p', '--port <number>', 'Search for specified port number') do |p|
         options['Port'] = p.to_i
       end
 
-      opts.on("-k", "--key-size <number>", "Search for SSL certs with a specific key size.") do |k|
+      opts.on('-k', '--key-size <number>', 'Search for SSL certs with a specific key size.') do |k|
         options['Key'] = k.to_i
       end
 
-      opts.on("--key-max <number>", "Search for SSL certs with the specified size or SMALLER") do |key_max|
+      opts.on('--key-max <number>', 'Search for SSL certs with the specified size or SMALLER') do |key_max|
         options['KeyMax'] = key_max.to_i
       end
 
-      opts.on("--key-min <number>", "Search for SSL certs with the specified size or LARGER") do |key_min|
+      opts.on('--key-min <number>', 'Search for SSL certs with the specified size or LARGER') do |key_min|
         options['KeyMin'] = key_min.to_i
       end
 
-      opts.on("--ssl-expired", "Show only services where the SSL certificate has expired.") do |ssl_expired|
+      opts.on('--ssl-expired', 'Show only services where the SSL certificate has expired.') do
         options['ssl_expired'] = true
       end
 
-      opts.on("-s", "--service <string>", "*Search service, product and information fields for the specified string") do |s|
+      opts.on('-s', '--service <string>', '*Search service, product and information fields for the specified string') do |s|
         options['Service'] = s.downcase
       end
 
-      opts.on("-o", "--operating-system <string>", "Search for specified OS string") do |o|
+      opts.on('-o', '--operating-system <string>', 'Search for specified OS string') do |o|
         options['OS'] = o.downcase
       end
 
 
-      opts.on("--all-ports", "Return a list of all open ports in the logs") do |all_ports|
+      opts.on('--all-ports', 'Return a list of all open ports in the logs') do
         options['All_Ports'] = true
         options['Port'] = 'all'
       end
 
-      opts.separator ""
-      opts.separator "Filter options:"
+      opts.separator ''
+      opts.separator 'Filter options:'
 
-      opts.on("--ssl-expired", "Show only services where the SSL certificate has expired.") do |ssl_expired|
+      opts.on('--ssl-expired', 'Show only services where the SSL certificate has expired.') do
         options['ssl_expired'] = true
         options['ssl_only'] = true
       end
 
-      opts.on("--ip-filter <ip_address>", "Filter results by IP Address",
-                                          "Acceptable formats are as a single IP address   (xxx.xxx.xxx.xxx)",
-                        "or in IP/CIDR notation                          (xxx.xxx.xxx.xxx/xx)",
-                        "or in IP/netmask notation                       (xxx.xxx.xxx.xxx/xxx.xxx.xxx.xxx)") do |address_filter|
+      opts.on('--ip-filter <ip_address>', 'Filter results by IP Address',
+              'Acceptable formats are as a single IP address   (xxx.xxx.xxx.xxx)',
+              'or in IP/CIDR notation                          (xxx.xxx.xxx.xxx/xx)',
+              'or in IP/netmask notation                       (xxx.xxx.xxx.xxx/xxx.xxx.xxx.xxx)') do |address_filter|
 
         # validate ip filter
         # check for format xxx.xxx.xxx.xxx
-        valid_filter = true if (address_filter.to_s =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/)
+        valid_filter = true if address_filter.to_s =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
 
         # check for format xxx.xxx.xxx.xxx/xx
-        valid_filter = true if (address_filter.to_s =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$/)
+        valid_filter = true if address_filter.to_s =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$/
 
         # check for format xxx.xxx.xxx.xxx/xxx.xxx.xxx.xxx (netmask)
-        valid_filter = true if (address_filter.to_s =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/)
+        valid_filter = true if address_filter.to_s =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
 
         if valid_filter
           $ip_filter = IPAddr.new address_filter.to_s
         else
           puts
-          puts "Error: Option passed for network address does not appear valid. Use -h to see valid formats."
+          puts 'Error: Option passed for network address does not appear valid. Use -h to see valid formats.'
           puts
           exit
         end # if valid_filter
       end
 
-      opts.on("--start-date <YYYY-MM-DD>", "Limit output to hosts scanned ON or AFTER the specified date, valid delimiters are . / and -") do |start_date|
+      opts.on('--start-date <YYYY-MM-DD>', 'Limit output to hosts scanned ON or AFTER the specified date, valid delimiters are . / and -') do |start_date|
         if (start_date.to_s =~ /^\d{4}[.\/-]\d{1,2}[.\/-]\d{1,2}$/)
           options['Start_date'] = Date.parse($&)
         else
           puts
-          puts "Error: Option passed for start date does not appear valid. Use -h to see valid formats."
+          puts 'Error: Option passed for start date does not appear valid. Use -h to see valid formats.'
           puts
           exit
         end
       end
 
-      opts.on("--end-date <YYYY-MM-DD>", "Limit output to hosts scanned ON or BEFORE the specified date, valid delimiters are . / and -") do |end_date|
+      opts.on('--end-date <YYYY-MM-DD>', 'Limit output to hosts scanned ON or BEFORE the specified date, valid delimiters are . / and -') do |end_date|
         if (end_date.to_s =~ /^\d{4}[.\/-]\d{1,2}[.\/-]\d{1,2}$/)
           options['End_date'] = Date.parse($&)
         else
           puts
-          puts "Error: Option passed for end date does not appear valid. Use -h to see valid formats."
+          puts 'Error: Option passed for end date does not appear valid. Use -h to see valid formats.'
           puts
           exit
         end
       end
 
-      opts.on("-e", "--exclude-port <number>", "Exclude results matching the specified port") do |e|
+      opts.on('-e', '--exclude-port <number>', 'Exclude results matching the specified port') do |e|
         options['Exclude_port'] = e.to_i
       end
 
-      opts.on("-x", "--exclude-service <string>", "*Exclude service where the service name or product matches the specified string") do |x|
+      opts.on('-x', '--exclude-service <string>', '*Exclude service where the service name or product matches the specified string') do |x|
         options['Exclude'] = x.downcase
       end
 
-      opts.on("--exclude-os <string>", "Exclude results matching the specified OS (if the OS is identified by Nmap)") do |exclude_os|
+      opts.on('--exclude-os <string>', 'Exclude results matching the specified OS (if the OS is identified by Nmap)') do |exclude_os|
         options['Exclude_os'] = exclude_os.downcase
       end
 
 
 
-      opts.separator ""
-      opts.separator "Misc options:"
+      opts.separator ''
+      opts.separator 'Misc options:'
 
-      opts.on("-l", "--log <location>", "*Specify a particular Nmap XML file or the location of the directory containing Nmap XML logs") do |l|
-        if ( File.directory?(l) && File.readable?(l) )
+      opts.on('-l', '--log <location>', '*Specify a particular Nmap XML file or the location of the directory containing Nmap XML logs') do |l|
+        if File.directory?(l) && File.readable?(l)
           $log_path = l
-        elsif ( File.file?(l) && File.readable?(l) )
+        elsif File.file?(l) && File.readable?(l)
           $listing = Array.new
           $listing[0] = l.to_s
         else
@@ -227,12 +227,12 @@ class ParseArgs
         end
       end
 
-      opts.on("-r", "--report <filename>", "*Output results to specified file, as opposed to the terminal") do |r|
+      opts.on('-r', '--report <filename>', '*Output results to specified file, as opposed to the terminal') do |r|
         if File.exist?(r)
           if !File.writable?(r)
             puts
             puts "Error:  Specified output (#{r}) file exists, but cannot be written to."
-            puts "        The file may be locked or your account may not have permssion to write to it."
+            puts '        The file may be locked or your account may not have permssion to write to it.'
             exit
           end
         end
@@ -241,24 +241,24 @@ class ParseArgs
 
       end
 
-      opts.on("-b", "--bare", "*Output IP Address only") do
+      opts.on('-b', '--bare', '*Output IP Address only') do
         options['Format_bare'] = true
       end
 
-      opts.on("-c", "--csv", "*Output results in CSV format") do
+      opts.on('-c', '--csv', '*Output results in CSV format') do
         options['Format_csv'] = true
       end
 
-      opts.on("--metrics <number>", "*Generate OS and port statistics, optionally limit result count") do |count|
+      opts.on('--metrics <number>', '*Generate OS and port statistics, optionally limit result count') do |count|
         options['Metric_counter'] = count.to_i
         options['Metrics'] = true
         legal_option = true
       end
 
 
-      opts.separator ""
+      opts.separator ''
 
-      opts.on("-v", "--version", "Show version information") do
+      opts.on('-v', '--version', 'Show version information') do
         puts
         puts "\tssl-query #{Prog_version} by Tom Sellers"
         puts
@@ -268,7 +268,7 @@ class ParseArgs
         exit
       end
 
-      opts.on_tail("-h", "--help", "Show this message") do
+      opts.on_tail('-h', '--help', 'Show this message') do
         puts opts
         exit
       end
@@ -277,16 +277,14 @@ class ParseArgs
     begin
       opts.parse!(args)
     rescue OptionParser::InvalidOption
-      puts "Invalid option, try -h for usage"
+      puts 'Invalid option, try -h for usage'
       exit
     end
 
     if !legal_option
-
-        options['All_Ports'] = true
-        options['Port'] = 'all'
-        legal_option = true
-
+      options['All_Ports'] = true
+      options['Port'] = 'all'
+      legal_option = true
     end #!legal_option
 
     options
@@ -300,13 +298,13 @@ def exit_interrupt
 
   puts
   puts
-  puts "Search canceled by user..."
+  puts 'Search canceled by user...'
   puts
   if $error_message
-    puts "##############################################################################"
-    puts "Errors during operation:"
+    puts '##############################################################################'
+    puts 'Errors during operation:'
     puts $error_message
-    puts "##############################################################################"
+    puts '##############################################################################'
   end # $error_message
 
   $reportfile.close if $reportfile
@@ -319,16 +317,16 @@ def exit_normal
   if $error_message
     puts
     puts
-    puts "##############################################################################"
-    puts "Errors during operation:"
+    puts '##############################################################################'
+    puts 'Errors during operation:'
     puts $error_message
-    puts "##############################################################################"
+    puts '##############################################################################'
   end # $error_message
 
   $reportfile.close if $reportfile
   exit
 
-end #clean_exit
+end # clean_exit
 
 class SSLPort
 
@@ -337,7 +335,7 @@ class SSLPort
   attr_reader :expire, :created, :type, :bits, :issuer, :subject
   attr_reader :sigalgo
 
-  #This depends on the current format of the ssl-cert.nse nmap script
+  # This depends on the current format of the ssl-cert.nse nmap script
   def initialize(host, ssl_port, timestamp)
 
     @addr         = host.addr
@@ -352,47 +350,31 @@ class SSLPort
 
     expire_regex = /Not valid after:  (\d{4}-\d{2}-\d{2}T\d\d:\d\d:\d\d)/
     match = expire_regex.match(ssl_port.script('ssl-cert').output)
-    if match
-      @expire = Date.parse(match[1])
-    end
+    @expire = Date.parse(match[1]) if match
 
     created_regex = /Not valid before: (\d{4}-\d{2}-\d{2}T\d\d:\d\d:\d\d)/
     match = created_regex.match(ssl_port.script('ssl-cert').output)
-    if match
-      @created = Date.parse(match[1])
-    end
+    @created = Date.parse(match[1]) if match
 
     type_regex = /Public Key type: (\w{1,5})/
     match = type_regex.match(ssl_port.script('ssl-cert').output)
-    if match
-      @type = match[1].upcase
-    end
+    @type = match[1].upcase if match
 
     bits_regex = /Public Key bits: (\w{1,5})/
     match = bits_regex.match(ssl_port.script('ssl-cert').output)
-    if match
-      @bits = match[1].to_i
-    end
+    @bits = match[1].to_i if match
 
-    #issuer_regex = /Issuer: (.*)\n/
     issuer_regex = /Issuer: commonName=([^\/\n]*)/
     match = issuer_regex.match(ssl_port.script('ssl-cert').output)
-    if match
-      @issuer = match[1]
-    end
+    @issuer = match[1] if match
 
-    #subject_regex = /Subject: (.*)\n/
     subject_regex = /Subject: commonName=([^\/\n]*)/
     match = subject_regex.match(ssl_port.script('ssl-cert').output)
-    if match
-      @subject = match[1]
-    end
+    @subject = match[1] if match
 
     sigalgo_regex = /Signature Algorithm: ([^\n]*)/
     match = sigalgo_regex.match(ssl_port.script('ssl-cert').output)
-    if match
-      @sigalgo = match[1]
-    end
+    @sigalgo = match[1] if match
 
   end
 
@@ -402,18 +384,17 @@ def gen_output
 
   counter = 0
 
-
   if $reportfile
-    $reportfile.puts "IP address,hostname,port,service,product,version,bits,type,issued,expires,subject,issuer,scan date"
+    $reportfile.puts 'IP address,hostname,port,service,product,version,bits,type,issued,expires,subject,issuer,scan date'
   else
-    puts "IP address,hostname,port,service,product,version,bits,type,issued,expires,subject,issuer,sigalgo,scan date"
+    puts 'IP address,hostname,port,service,product,version,bits,type,issued,expires,subject,issuer,sigalgo,scan date'
   end
 
 
   $Results.sort {|a,b| 1*(a.timestamp<=>b.timestamp)}.each { |port|
 
     # Add conditional code here
-    counter +=1
+    counter += 1
 
     puts "#{port.addr},#{port.hostname},#{port.num}/#{port.proto},#{port.tunnel}/#{port.svcname},\"#{port.svcproduct}\",\"#{port.svcversion}\",#{port.bits},#{port.type},#{port.created},#{port.expire},\"#{port.subject}\",\"#{port.issuer}\",#{port.sigalgo},#{port.timestamp}"
   }
@@ -423,7 +404,7 @@ def gen_output
   puts "Runtime #{endtime}"
 end
 
-def port_search (port_num)
+def port_search(port_num)
 
   $listing.each { |file|
 
@@ -442,7 +423,7 @@ def port_search (port_num)
       end # $error_message
 
     else
-      timestamp = Time.at(parser.session.start_time).strftime("%Y/%m/%d %X")
+      timestamp = Time.at(parser.session.start_time).strftime('%Y/%m/%d %X')
 
       if $params['Start_date']
         scan_date = Date.parse(timestamp)
@@ -455,14 +436,11 @@ def port_search (port_num)
       end
 
 
+      parser.hosts('up') do |host|
 
-      parser.hosts("up") do |host|
-
-        #Host level filtering here
+        # Host level filtering here
         if $ip_filter
-          if !$ip_filter.include?(IPAddr.new(host.ip4_addr))
-            next
-          end
+          next unless $ip_filter.include?(IPAddr.new(host.ip4_addr))
         end
 
         if host.os.name
@@ -471,13 +449,11 @@ def port_search (port_num)
           end
 
           if $params['OS']
-            next if !(host.os.name.downcase.include?($params['OS']))
+            next unless host.os.name.downcase.include?($params['OS'])
           end
         end
 
-        host.getports(:any,"open") do |port|
-
-          exclude_port = false
+        host.getports(:any, 'open') do |port|
 
           # Port level filtering here
           if $params['Exclude_port']
@@ -492,7 +468,7 @@ def port_search (port_num)
             # Service string matching for INCLUSION or EXCLUSION in result set
             if $params['Service'] || $params['Exclude']
 
-            port_string = nil
+              port_string = nil
 
               if port.service.name
                 port_string = port.service.name
@@ -504,33 +480,33 @@ def port_search (port_num)
 
               # Use the same benchmark as nmap (name_confidence in portlist.cc)
               # to determine the need for the ? on the end of the service name
-              if port.service.confidence  && port.service.confidence <= 5
-                port_string = port_string + "?"
+              if port.service.confidence && port.service.confidence <= 5
+                port_string = port_string + '?'
               end
 
               if port.service.product
-                port_string = port_string + ' ' + port.service.product
+                port_string += ' ' + port.service.product
               end
 
               if port.service.version
-                port_string = port_string + ' ' + port.service.version
+                port_string += ' ' + port.service.version
               end
 
               if port.service.extra
-                port_string = port_string + ' ' + port.service.extra
+                port_string += ' ' + port.service.extra
               end
 
               port_string = port_string.downcase
 
               if $params['Service']
                 foundmatch = false
-                port_string.scan($params['Service']) {|match| foundmatch = true}
-                next if !foundmatch
+                port_string.scan($params['Service']) { |match| foundmatch = true }
+                next unless foundmatch
               end
 
               if $params['Exclude']
                 foundmatch = false
-                port_string.scan($params['Exclude']) {|match| foundmatch = true}
+                port_string.scan($params['Exclude']) { |match| foundmatch = true }
                 next if foundmatch
               end
 
@@ -546,17 +522,14 @@ def port_search (port_num)
                 # Key bits filtering
                 if ssl_service.bits
                   if $params['Key']
-                    # REMOVE - exclude_port = true if !(ssl_service.bits == $params['Key'])
-                    next if !(ssl_service.bits == $params['Key'])
+                    next unless ssl_service.bits == $params['Key']
                   end
 
                   if $params['KeyMax']
-                    # REMOVE - exclude_port = true if ssl_service.bits > $params['KeyMax']
                     next if ssl_service.bits > $params['KeyMax']
                   end
 
                   if $params['KeyMin']
-                    # REMOVE - exclude_port = true if ssl_service.bits < $params['KeyMin']
                     next if ssl_service.bits < $params['KeyMin']
                   end
                 end
@@ -564,16 +537,12 @@ def port_search (port_num)
                 # Cert date filtering
                 if ssl_service.expire
                   if $params['ssl_expired']
-                    next if !(ssl_service.expire < $now)
+                    next unless ssl_service.expire < $now
                   end
 
                 end
 
-                # If the port passes all tests then add it to the results array
-                if !exclude_port
-                  $Results.push(ssl_service)
-                end
-
+                $Results.push(ssl_service)
 
               end
             end
@@ -589,6 +558,5 @@ def port_search (port_num)
 
   gen_output
 
-end #port_search
-
+end # port_search
 }
