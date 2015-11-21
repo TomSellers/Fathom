@@ -454,7 +454,7 @@ def port_search(port_num)
         end
 
         host.getports(:any, 'open') do |port|
-
+          next if (port.state == 'open|filtered') && (port.reason == 'no-response')
           # Port level filtering here
           if $params['Exclude_port']
             if port.num

@@ -497,6 +497,7 @@ def port_search(port_num)
       parser.hosts('up') do |host|
 
         host.getports(:any, 'open') do |port|
+          next if (port.state == 'open|filtered') && (port.reason == 'no-response')
           if port.num == port_num
             srv = port.service
             gen_output host, port, srv, timestamp
@@ -868,6 +869,7 @@ def script_search(script_string)
 
 
         host.getports(:any, 'open') do |port|
+          next if (port.state == 'open|filtered') && (port.reason == 'no-response')
           srv = port.service
 
           port.scripts do |script|
@@ -942,7 +944,7 @@ def statistics(counter)
           host_os = host.os.name
           if host_os
             host_os = host_os.downcase
-            next if !host_os.include?($params['OS'])
+            next unless host_os.include?($params['OS'])
           else
             next
           end # if host_os
@@ -955,6 +957,7 @@ def statistics(counter)
 
 
         host.getports(:any, 'open') do |port|
+          next if (port.state == 'open|filtered') && (port.reason == 'no-response')
 
           # Develop stats on ports
           port_stats["#{port.num}/#{port.proto}"] += 1
