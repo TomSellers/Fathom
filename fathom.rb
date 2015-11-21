@@ -366,7 +366,8 @@ def gen_output(host, port, srv, timestamp, script = '')
     return unless $ip_filter.include?(IPAddr.new(host.ip4_addr))
   end
 
-  exclude_result = false
+  # Filter excluded ports
+  return if $params['Exclude_port'] && port.num == $params['Exclude_port']
 
   # Handle specifically excluded OSes
   if $params['Exclude_os']
@@ -375,7 +376,7 @@ def gen_output(host, port, srv, timestamp, script = '')
 
     if host_os
       host_os = host_os.downcase
-      exclude_result = true if host_os.include?($params['Exclude_os'])
+      return if host_os.include?($params['Exclude_os'])
     end
   end
 
@@ -386,10 +387,10 @@ def gen_output(host, port, srv, timestamp, script = '')
 
     if host_os
       host_os = host_os.downcase
-      exclude_result = !host_os.include?($params['OS'])
+      return unless host_os.include?($params['OS'])
     else
       # if host_os is not defined, we skip the host
-      exclude_result = true
+      return
     end # if host_os
   end
 
@@ -399,14 +400,10 @@ def gen_output(host, port, srv, timestamp, script = '')
     if srv.product
       portstring = srv.product
       portstring = portstring.downcase
-      exclude_result = true if portstring.include?($params['Exclude'])
+      return if portstring.include?($params['Exclude'])
     end # srv.product
 
   end  # if $params['Exclude']
-
-
-  # Stop processing output if this result was excluded for any reason
-  return if exclude_result
 
   # Build output string
   if $params['Format_bare']
