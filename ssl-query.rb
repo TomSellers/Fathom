@@ -613,6 +613,7 @@ def statistics
   sigalgo_stats  = Hash.new(0)
   type_stats     = Hash.new(0)
   issuer_stats   = Hash.new(0)
+  subject_stats  = Hash.new(0)
   host_counter   = 0
 
   $Results.each { |port|
@@ -625,6 +626,7 @@ def statistics
     bits_stats["#{port.bits}"]               += 1 # if port.bits
     sigalgo_stats["#{port.sigalgo}"]         += 1 # if port.sigalgo
     issuer_stats["#{port.issuer}"]           += 1 # if port.issuer
+    subject_stats["#{port.subject}"]         += 1 # if port.subject
     type_stats["#{port.type}"]               += 1 # if port.type
 
   }
@@ -685,6 +687,15 @@ def statistics
   puts
   puts 'Count  Issuer'
   issuer_stats.sort { |a, b| -1 * (a[1] <=> b[1]) }.each_with_index { |item, index|
+    break if counter && index.to_i == counter
+    puts sprintf('%5d  %s ', item[1], item[0])
+  }
+ 
+  puts
+  puts 'Subject statistics:'
+  puts
+  puts 'Count  Subject'
+  subject_stats.sort { |a, b| -1 * (a[1] <=> b[1]) }.each_with_index { |item, index|
     break if counter && index.to_i == counter
     puts sprintf('%5d  %s ', item[1], item[0])
   }
