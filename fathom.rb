@@ -892,11 +892,12 @@ end  # script_search (script_string)
 
 def statistics(counter)
 
-  port_stats     = Hash.new(0)
-  os_stats       = Hash.new(0)
-  service_stats  = Hash.new(0)
-  product_stats  = Hash.new(0)
-  host_counter   = 0
+  port_stats       = Hash.new(0)
+  os_stats         = Hash.new(0)
+  service_stats    = Hash.new(0)
+  product_stats    = Hash.new(0)
+  mac_vendor_stats = Hash.new(0)
+  host_counter     = 0
 
   $listing.each { |file|
 
@@ -952,6 +953,8 @@ def statistics(counter)
 
         host_counter = host_counter + 1
 
+        mac_vendor_stats["#{host.mac_vendor}"] += 1
+        
         # Increment OS stats counter by 1
         os_stats["#{host.os.name}"] += 1
 
@@ -985,11 +988,10 @@ def statistics(counter)
   # Reverse sort the hash table (thats the -1 part), then iterate through
   # the temporary array and display the results.
 
-  os_stats.sort {|a,b| -1*(a[1]<=>b[1])}.each_with_index { |item, index|
+  os_stats.sort { |a, b| -1 * (a[1] <=> b[1]) }.each_with_index { |item, index|
     break if counter && index.to_i == counter
     puts sprintf('%5d  %s ', item[1], item[0])
   }
-
 
   puts
   puts 'Port statistics:'
@@ -998,7 +1000,7 @@ def statistics(counter)
   # Reverse sort the hash table (thats the -1 part), then iterate through
   # the temporary array and display the results.
 
-  port_stats.sort {|a,b| -1*(a[1]<=>b[1])}.each_with_index { |item, index|
+  port_stats.sort { |a, b| -1 * (a[1] <=> b[1]) }.each_with_index { |item, index|
     break if counter && index.to_i == counter
     puts sprintf('%5d  %s ', item[1], item[0])
   }
@@ -1011,7 +1013,7 @@ def statistics(counter)
   # Reverse sort the hash table (thats the -1 part), then iterate through
   # the temporary array and display the results.
 
-  service_stats.sort {|a,b| -1*(a[1]<=>b[1])}.each_with_index { |item, index|
+  service_stats.sort { |a, b| -1 * (a[1] <=> b[1]) }.each_with_index { |item, index|
     break if counter && index.to_i == counter
     puts sprintf('%5d  %s ', item[1], item[0])
   }
@@ -1023,7 +1025,16 @@ def statistics(counter)
   # Reverse sort the hash table (thats the -1 part), then iterate through
   # the temporary array and display the results.
 
-  product_stats.sort {|a,b| -1*(a[1]<=>b[1])}.each_with_index { |item, index|
+  product_stats.sort { |a, b| -1 * (a[1] <=> b[1]) }.each_with_index { |item, index|
+    break if counter && index.to_i == counter
+    puts sprintf('%5d  %s ', item[1], item[0])
+  }
+
+  puts
+  puts 'MAC Vendor statistics:'
+  puts
+  puts 'Count  Vendor'
+  mac_vendor_stats.sort { |a, b| -1 * (a[1] <=> b[1]) }.each_with_index { |item, index|
     break if counter && index.to_i == counter
     puts sprintf('%5d  %s ', item[1], item[0])
   }

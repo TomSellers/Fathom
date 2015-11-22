@@ -1,10 +1,11 @@
-0.98.01 2015.11.20
+0.98.01 2015.11.21
 
     Search:  ssl-query.rb - added ability to search based on the certificate's signature algorithm 
     Search:  ssl-query.rb - added certificate's signature algorithm to output
     
     General: ssl-query.rb - Added --metrics to report certificate attribute stats, filterable by port, etc.
-
+    General: fathom.rb    - Added MAC address vendor to --metrics data
+    
     Output:  ssl-query.rb - Added -b for bare IP output ( + error messages )
     
 		Cleanup: Code cleanup in fathom.rb and ssl-query.rb
