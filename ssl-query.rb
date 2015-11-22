@@ -132,8 +132,8 @@ class ParseArgs
         legal_option = true
       end
 
-      opts.on('--ssl-expired', 'Show only services where the TLS certificate has expired.') do
-        options['ssl_expired'] = true
+      opts.on('--cert-expired', 'Show only services where the TLS certificate has expired.') do
+        options['cert_expired'] = true
         options['Cert_Search'] = true
       end
 
@@ -252,7 +252,7 @@ class ParseArgs
 
       end
 
-      opts.on('-b', '--bare', '*Output IP Address only') do
+      opts.on('-b', '--bare', 'Output IP Address only') do
         options['Format_bare'] = true
       end
 
@@ -260,10 +260,13 @@ class ParseArgs
         options['Format_csv'] = true
       end
 
-      opts.on('--metrics <number>', '*Generate OS and port statistics, optionally limit result count') do |count|
-        options['Metric_counter'] = count.to_i
+      opts.on('--metrics [number]', 'Generate OS and port statistics, optionally limit result count') do |count|
+        if count.to_i > 0
+          options['Metric_counter'] = count.to_i
+        else
+          options['Metric_counter'] = nil
+        end
         options['Metrics'] = true
-        legal_option = true
       end
 
 
@@ -399,22 +402,28 @@ def gen_output
 
   if $reportfile
     $reportfile.puts 'IP address,hostname,port,service,product,version,bits,type,issued,expires,subject,issuer,scan date'
-  else
+  elsif !$params['Format_bare'] 
     puts 'IP address,hostname,port,service,product,version,bits,type,issued,expires,subject,issuer,sigalgo,scan date'
   end
 
 
-  $Results.sort {|a,b| 1*(a.timestamp<=>b.timestamp)}.each { |port|
+  $Results.sort { |a, b| 1*(a.addr <=> b.addr)}.each { |port|
 
     # Add conditional code here
     counter += 1
-
-    puts "#{port.addr},#{port.hostname},#{port.num}/#{port.proto},#{port.tunnel}/#{port.svcname},\"#{port.svcproduct}\",\"#{port.svcversion}\",#{port.bits},#{port.type},#{port.created},#{port.expire},\"#{port.subject}\",\"#{port.issuer}\",#{port.sigalgo},#{port.timestamp}"
+    if $params['Format_bare']
+      puts port.addr
+    else
+      puts "#{port.addr},#{port.hostname},#{port.num}/#{port.proto},#{port.tunnel}/#{port.svcname},\"#{port.svcproduct}\",\"#{port.svcversion}\",#{port.bits},#{port.type},#{port.created},#{port.expire},\"#{port.subject}\",\"#{port.issuer}\",#{port.sigalgo},#{port.timestamp}"
+    end
   }
- # $Results.each {|sslport| puts "#{sslport.addr},#{sslport.timestamp}" }
-  puts "\r\nTotal output hosts:  #{counter}"
-  endtime = Time.now - $starttime
-  puts "Runtime #{endtime}"
+
+  unless $params['Format_bare']
+    puts "\r\nTotal output hosts:  #{counter}"
+    endtime = Time.now - $starttime
+    puts "Runtime #{endtime}"
+  end
+
 end
 
 def port_search(port_num)
@@ -490,7 +499,7 @@ def port_search(port_num)
               end
 
               if port.service.tunnel
-                port_string = port.service.tunnel + "/" + port_string
+                port_string = port.service.tunnel + '/' + port_string
               end
 
               # Use the same benchmark as nmap (name_confidence in portlist.cc)
@@ -532,7 +541,7 @@ def port_search(port_num)
 
               # SSL level filtering here
               if $params['Cert_Search']
-              
+
                 # Key bits filtering
                 if ssl_service.bits
                   if $params['Key']
@@ -549,7 +558,7 @@ def port_search(port_num)
                 end
 
                 # Cert date filtering
-                if $params['ssl_expired']
+                if $params['cert_expired']
                   if ssl_service.expire
                     next unless ssl_service.expire < $now
                   end
@@ -561,7 +570,7 @@ def port_search(port_num)
                     next unless ssl_service.sigalgo.downcase == $params['Sigalgo']
                   end
                 end
-                
+
               end # $params['Cert_Search']
 
               # Report anything that makes it this far
@@ -574,7 +583,7 @@ def port_search(port_num)
                 $Results.push(ssl_service)
               end
             end # port.script...
-          
+
           end
 
         end  # host.getports
@@ -585,7 +594,113 @@ def port_search(port_num)
     end  # begin
   }
 
-  gen_output
+  if $params['Metrics']
+    statistics
+  else
+    gen_output
+  end
 
 end # port_search
+
+def statistics
+
+  counter = $params['Metric_counter'] if $params['Metric_counter']
+
+  port_stats     = Hash.new(0)
+  service_stats  = Hash.new(0)
+  bits_stats     = Hash.new(0)
+  product_stats  = Hash.new(0)
+  sigalgo_stats  = Hash.new(0)
+  type_stats     = Hash.new(0)
+  issuer_stats   = Hash.new(0)
+  host_counter   = 0
+
+  $Results.each { |port|
+
+    host_counter = host_counter + 1
+
+    port_stats["#{port.num}/#{port.proto}"]  += 1 # if port.num && port.proto
+    service_stats["#{port.svcname}"]         += 1 # if port.svcname
+    product_stats["#{port.svcproduct}"]      += 1 # if port.svcproduct
+    bits_stats["#{port.bits}"]               += 1 # if port.bits
+    sigalgo_stats["#{port.sigalgo}"]         += 1 # if port.sigalgo
+    issuer_stats["#{port.issuer}"]           += 1 # if port.issuer
+    type_stats["#{port.type}"]               += 1 # if port.type
+
+  }
+
+  puts
+  puts "The specified subset of logs contain information on #{host_counter} hosts."
+
+  puts
+  puts 'Port statistics:'
+  puts
+  puts 'Count  Port'
+  # Reverse sort the hash table (thats the -1 part), then iterate through
+  # the temporary array and display the results.
+  port_stats.sort { |a, b| -1 * (a[1] <=> b[1]) }.each_with_index { |item, index|
+    break if counter && index.to_i == counter
+    puts sprintf('%5d  %s ', item[1], item[0])
+  }
+
+
+  puts
+  puts 'Service statistics:'
+  puts
+  puts 'Count  Service'
+  service_stats.sort { |a, b| -1 * (a[1] <=> b[1]) }.each_with_index { |item, index|
+    break if counter && index.to_i == counter
+    puts sprintf('%5d  %s ', item[1], item[0])
+  }
+
+  puts
+  puts 'Product statistics:'
+  puts
+  puts 'Count  Product'
+  product_stats.sort { |a, b| -1 * (a[1] <=> b[1]) }.each_with_index { |item, index|
+    break if counter && index.to_i == counter
+    puts sprintf('%5d  %s ', item[1], item[0])
+  }
+
+  puts
+  puts 'Bit strength statistics:'
+  puts
+  puts 'Count  Bits'
+  bits_stats.sort { |a, b| -1 * (a[1] <=> b[1]) }.each_with_index { |item, index|
+    break if counter && index.to_i == counter
+    puts sprintf('%5d  %s ', item[1], item[0])
+  }
+    
+  puts
+  puts 'Signature Algorithm statistics:'
+  puts
+  puts 'Count  Signature Algorithm'
+  sigalgo_stats.sort { |a, b| -1 * (a[1] <=> b[1]) }.each_with_index { |item, index|
+    break if counter && index.to_i == counter
+    puts sprintf('%5d  %s ', item[1], item[0])
+  }
+
+  puts
+  puts 'Issuer statistics:'
+  puts
+  puts 'Count  Issuer'
+  issuer_stats.sort { |a, b| -1 * (a[1] <=> b[1]) }.each_with_index { |item, index|
+    break if counter && index.to_i == counter
+    puts sprintf('%5d  %s ', item[1], item[0])
+  }
+
+  puts
+  puts 'Certificate type statistics:'
+  puts
+  puts 'Count  Type'
+  type_stats.sort { |a, b| -1 * (a[1] <=> b[1]) }.each_with_index { |item, index|
+    break if counter && index.to_i == counter
+    puts sprintf('%5d  %s ', item[1], item[0])
+  }
+
+  puts
+  puts
+
+end # statistics
+
 }
