@@ -1,6 +1,6 @@
 #!/bin/bash
 #  
-#  sweep-full.sh v0.98
+#  sweep-full.sh v0.98.01
 #
 #  The purpose of this script is to peform a full (intensive) scan against a list of hosts.
 #  Input is a file (./lists/scanlist-random.txt) containing a list of IP addresses.  

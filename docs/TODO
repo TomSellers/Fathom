@@ -1,12 +1,10 @@
 fathom.rb
 
 	- Output: Sort result
-	- Deal with UDP port status of open|filtered, etc
 	- Deal with the new pre-script results intelligently, we cannot
 	       search them normally as quite bit of non-host or other host
 		   related info ends up here that would trash the search results.
 		   Sent email to list - http://seclists.org/nmap-dev/2010/q4/100
-	- Statistics - generate MAC statistics
 			
 fp-list.rb
 	

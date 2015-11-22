@@ -1,86 +1,107 @@
+0.98.01 2015.11.21
+
+    Search:  ssl-query.rb - added ability to search based on the certificate's signature algorithm 
+    Search:  ssl-query.rb - added certificate's signature algorithm to output
+    
+    General: ssl-query.rb - Added --metrics to report certificate attribute stats, filterable by port, etc.
+    General: fathom.rb    - Added MAC address vendor to --metrics data
+    
+    Output:  ssl-query.rb - Added -b for bare IP output ( + error messages )
+    
+		Cleanup: Code cleanup in fathom.rb and ssl-query.rb
+
+		BUG: fathom.rb - Fixed broken port exclusion switch ( -e )
+    BUG: ssl-query.rb - Fixed broken port selection logic
+    BUG: Fixed handling of UDP open|filtered ports
+
+
+
+0.98    The lost years...
+
+
 0.97	2010.11.07
 
-		Scanning: Package now includes scanning and maintenance shell scripts for generating data and keeping it up to date.
-		Scanning: Set --host-timeout to 10 minutes in scan-full.sh, scan-recon.sh and scan-genlogs.sh to limit impact of slow hosts.
+    Scanning: Package now includes scanning and maintenance shell scripts for generating data and keeping it up to date.
+    Scanning: Set --host-timeout to 10 minutes in scan-full.sh, scan-recon.sh and scan-genlogs.sh to limit impact of slow hosts.
 	
-		Search: Added -m / --mac-address to search by MAC address or MAC vendor string. This will use results from nbstat.nse if the MAC data isn't present but nbstat data is.
-				Thanks to Ron Bowes (www.skullsecurity.org) for this idea.
+    Search: Added -m / --mac-address to search by MAC address or MAC vendor string. This will use results from nbstat.nse if the MAC data isn't present but nbstat data is.
+        Thanks to Ron Bowes (www.skullsecurity.org) for this idea.
 
-		Output:	 Cleanup of tabular (default) output from port and OS queries
-		
-		General: Renamed scripts and files to use dash "-" instead of underscore for usability and consistency.
-		General: Cleanup of --metrics code to handle hashes more efficiently
-				 
-		Data Maint:	util-cleanup.rb - Added IP address based selection of files to move to the backup directory
-		Data Maint: util-cleanup.rb - Added --purge command to delete backup directory contents
+    Output:	 Cleanup of tabular (default) output from port and OS queries
+    
+    General: Renamed scripts and files to use dash "-" instead of underscore for usability and consistency.
+    General: Cleanup of --metrics code to handle hashes more efficiently
+         
+    Data Maint:	util-cleanup.rb - Added IP address based selection of files to move to the backup directory
+    Data Maint: util-cleanup.rb - Added --purge command to delete backup directory contents
 
-		BUG: Fixed a issue in Fathom where --script-data was not searching host script output.
-		
+    BUG: Fixed a issue in Fathom where --script-data was not searching host script output.
+    
 0.96	2010.07.11
 
-		Cleanup: Code cleanup and efficiency changes
-			     Thanks to Kris Katterjohn
-			
-		BUG: Fixed directory specification and options order issue
-			 Thanks to David Fifield
-		
-		Metrics: Added counts for service product
-		
-		Output: Added -r / --report option to specify output file
-				All query results will be written to this file
-				
-		Input: Changed -l / --log to handle individual files as well as directories
-			   Long option is now --log instead of --log-dir
-			   Clarified error message when input XML file does not exist
-				
-		Output Filter: Added --ip-filter to permit filtering of output
-			by host IP address, takes single host, IP/CIDR and IP/netmask notation 
-			The metrics and all host outputs respect this filter
+    Cleanup: Code cleanup and efficiency changes
+    	     Thanks to Kris Katterjohn
+    	
+    BUG: Fixed directory specification and options order issue
+    	 Thanks to David Fifield
+    
+    Metrics: Added counts for service product
+    
+    Output: Added -r / --report option to specify output file
+        All query results will be written to this file
+        
+    Input: Changed -l / --log to handle individual files as well as directories
+    	   Long option is now --log instead of --log-dir
+    	   Clarified error message when input XML file does not exist
+        
+    Output Filter: Added --ip-filter to permit filtering of output
+    	by host IP address, takes single host, IP/CIDR and IP/netmask notation 
+    	The metrics and all host outputs respect this filter
 
-		Output Filter: Added --start-date and --end-date to permit filtering of
-			output to just scans that occurred before or after specified dates.
-			The metrics and all host outputs respect this filter
-			
-		Output Filter: Added --exclude-os to permit filtering of output 
-			by host OS.  Usefulness depends on if Nmap was requested to perform
-			OS identification and the accuracy of the result.
-			
-		General: Improved grouping and format of -h output			
-		General: Improved error handling when an Interrupt is sent (Control-C)
-		Cleanup: Collapsed -a/--all method into special case of os_search
-			
+    Output Filter: Added --start-date and --end-date to permit filtering of
+    	output to just scans that occurred before or after specified dates.
+    	The metrics and all host outputs respect this filter
+    	
+    Output Filter: Added --exclude-os to permit filtering of output 
+    	by host OS.  Usefulness depends on if Nmap was requested to perform
+    	OS identification and the accuracy of the result.
+    	
+    General: Improved grouping and format of -h output    	
+    General: Improved error handling when an Interrupt is sent (Control-C)
+    Cleanup: Collapsed -a/--all method into special case of os_search
+    	
 0.95	2010.06.26
 
-		Changed format of -a / --all to include more data on OS family, type
-		Updated fp-list -s / --service to allow optional service name parameter (http, ftp, etc)
-		Updated fp-list CSV output to include service name
-		Flag -m has been changed to -e (--exclude-port)
-		Added --script-data to search for text in NSE script output or title
-			Honors port, service name and OS exclusion flags
-		
+    Changed format of -a / --all to include more data on OS family, type
+    Updated fp-list -s / --service to allow optional service name parameter (http, ftp, etc)
+    Updated fp-list CSV output to include service name
+    Flag -m has been changed to -e (--exclude-port)
+    Added --script-data to search for text in NSE script output or title
+    	Honors port, service name and OS exclusion flags
+    
 
 0.94
-		Name change from nQuery to fathom
-		Added ability to query for all hosts in the logs (-a / --all-hosts)
-			Updated --metrics to include count of hosts that were up
-		Added -v/--version to report program and supporting library versions
+    Name change from nQuery to fathom
+    Added ability to query for all hosts in the logs (-a / --all-hosts)
+    	Updated --metrics to include count of hosts that were up
+    Added -v/--version to report program and supporting library versions
 0.93
 
-		Updated to use Nmap::Parser 0.3.5
-		Converted command line parsing to use OptionParser
-			Cleaner results, built in -h result
-		Change port logic to use getports
-		Changed date format, added timestamp as parameter to gen_output
-		Improved error handling
-			Moved error messages so that they all occur after the query result output
-		Improved service and port result exclusion (-x / -m)
-		Added ability to specify log directory via command line
-		Added service name to -s / --service query logic, was just searching Product and Extra Info values
-		Added ability to generate port, service, host and OS statistics (--metrics)
-			--metrics takes optional number indicating results count to return
-		Fixed CSV output, standardized in fp-list.rb, tailored in fathom.rb
-		
+    Updated to use Nmap::Parser 0.3.5
+    Converted command line parsing to use OptionParser
+    	Cleaner results, built in -h result
+    Change port logic to use getports
+    Changed date format, added timestamp as parameter to gen_output
+    Improved error handling
+    	Moved error messages so that they all occur after the query result output
+    Improved service and port result exclusion (-x / -m)
+    Added ability to specify log directory via command line
+    Added service name to -s / --service query logic, was just searching Product and Extra Info values
+    Added ability to generate port, service, host and OS statistics (--metrics)
+    	--metrics takes optional number indicating results count to return
+    Fixed CSV output, standardized in fp-list.rb, tailored in fathom.rb
+    
 
 
   
-		
+    

@@ -1,6 +1,6 @@
 #!/bin/bash
 #  
-#  sweep-recon.sh v0.98
+#  sweep-recon.sh v0.98.01
 #
 #  The purpose of this script is to peform a recon (port scan only) scan against a list of hosts.
 #  Input is a file (./lists/scanlist-random.txt) containing a list of IP addresses.  

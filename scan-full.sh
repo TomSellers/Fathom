@@ -1,6 +1,6 @@
 #!/bin/bash
 #  
-#  scan-full.sh v0.98
+#  scan-full.sh v0.98.01
 #
 #  Perform nmap port scan on all TCP ports and a subset of UDP ports, performing 
 #  version detection.  Exclude hosts as directed by ./lists/excludes-full.txt

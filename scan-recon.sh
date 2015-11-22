@@ -1,6 +1,6 @@
 #!/bin/bash
 #  
-#  scan-recon.sh v0.98
+#  scan-recon.sh v0.98.01
 #
 #  Perform nmap port scan on all TCP ports and a subset of UDP ports, 
 #  **NO** scripts are run and **NO** version detection is performed.  
