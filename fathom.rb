@@ -763,6 +763,7 @@ def mac_search(mac_string)
             if script.id == 'nbstat'
               match = nil
               match = mac_regex.match(script.output)
+              # next unless script.output
               # script_result = script.output.downcase
               if match
                 host_mac = match[1].upcase if match[1]
@@ -860,6 +861,7 @@ def script_search(script_string)
 
         # Changes to deal with host level scripts
         host.scripts do |script|
+          next unless script.output
           script_result = script.output.downcase
           if (script_result.include? script_string) || (script.id.include? script_string)
             gen_output host, '', '', timestamp, script
@@ -873,6 +875,7 @@ def script_search(script_string)
           srv = port.service
 
           port.scripts do |script|
+            next unless script.output
             script_result = script.output.downcase
             if (script_result.include? script_string) || (script.id.include? script_string)
               gen_output host, port, srv, timestamp, script
