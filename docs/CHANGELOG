@@ -10,9 +10,9 @@
     
     Output:  cert-query.rb - Added -b for bare IP output ( + error messages )
     
-		Cleanup: Code cleanup in fathom.rb and cert-query.rb
+    Cleanup: Code cleanup in fathom.rb and cert-query.rb
 
-		BUG: fathom.rb - Fixed broken port exclusion switch ( -e )
+    BUG: fathom.rb - Fixed broken port exclusion switch ( -e )
     BUG: cert-query.rb - Fixed broken port selection logic
     BUG: Fixed handling of UDP open|filtered ports
 
