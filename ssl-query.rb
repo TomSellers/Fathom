@@ -117,19 +117,16 @@ class ParseArgs
       opts.on('-k', '--key-size <number>', 'Search for TLS certs with a specific key size.') do |k|
         options['Key'] = k.to_i
         options['Cert_Search'] = true
-        legal_option = true
       end
 
       opts.on('--key-max <number>', 'Search for TLS certs with the specified size or SMALLER') do |key_max|
         options['KeyMax'] = key_max.to_i
         options['Cert_Search'] = true
-        legal_option = true
       end
 
       opts.on('--key-min <number>', 'Search for TLS certs with the specified size or LARGER') do |key_min|
         options['KeyMin'] = key_min.to_i
         options['Cert_Search'] = true
-        legal_option = true
       end
 
       opts.on('--cert-expired', 'Show only services where the TLS certificate has expired.') do
@@ -316,8 +313,8 @@ def exit_interrupt
   puts
   if $error_message
     puts '##############################################################################'
-    puts 'Errors during operation:'
-    puts $error_message
+    puts '# Errors during operation:'
+    puts "# #{$error_message}"
     puts '##############################################################################'
   end # $error_message
 
@@ -332,8 +329,8 @@ def exit_normal
     puts
     puts
     puts '##############################################################################'
-    puts 'Errors during operation:'
-    puts $error_message
+    puts '# Errors during operation:'
+    puts "# #{$error_message}"
     puts '##############################################################################'
   end # $error_message
 

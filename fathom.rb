@@ -334,8 +334,8 @@ def exit_interrupt
   puts
   if $error_message
     puts '##############################################################################'
-    puts 'Errors during operation:'
-    puts $error_message
+    puts '# Errors during operation:'
+    puts "# #{$error_message}"
     puts '##############################################################################'
   end # $error_message
 
@@ -350,8 +350,8 @@ def exit_normal
     puts
     puts
     puts '##############################################################################'
-    puts 'Errors during operation:'
-    puts $error_message
+    puts '# Errors during operation:'
+    puts "# #{$error_message}"
     puts '##############################################################################'
   end # $error_message
 
