@@ -344,7 +344,7 @@ class SSLPort
   attr_reader :addr, :hostname, :num, :proto
   attr_reader :tunnel, :svcname, :svcversion, :svcproduct, :timestamp
   attr_reader :expire, :created, :type, :bits, :issuer, :subject
-  attr_reader :sigalgo
+  attr_reader :sigalgo, :thumbprint
 
   # This depends on the current format of the ssl-cert.nse nmap script
   def initialize(host, ssl_port, timestamp)
@@ -387,6 +387,12 @@ class SSLPort
       sigalgo_regex = /Signature Algorithm: ([^\n]*)/
       match = sigalgo_regex.match(ssl_port.script('ssl-cert').output)
       @sigalgo = match[1] if match
+
+      thumbprint_regex = /SHA-1:([^\n]*)/
+      match = thumbprint_regex.match(ssl_port.script('ssl-cert').output)
+      @thumbprint = match[1] if match
+
+
     end
 
   end
@@ -611,6 +617,8 @@ def statistics
   type_stats     = Hash.new(0)
   issuer_stats   = Hash.new(0)
   subject_stats  = Hash.new(0)
+  thumbprint_stats = Hash.new(0)
+  thumbprint_subject = Hash.new(0)
   host_counter   = 0
 
   $Results.each { |port|
@@ -625,7 +633,10 @@ def statistics
     issuer_stats["#{port.issuer}"]           += 1 # if port.issuer
     subject_stats["#{port.subject}"]         += 1 # if port.subject
     type_stats["#{port.type}"]               += 1 # if port.type
-
+    thumbprint_stats["#{port.thumbprint}"]  += 1 # if port.thumbprint
+    if thumbprint_stats["#{port.thumbprint}"] > 1
+      thumbprint_subject["#{port.thumbprint}"] = port.subject
+    end
   }
 
   puts
@@ -704,6 +715,15 @@ def statistics
   type_stats.sort { |a, b| -1 * (a[1] <=> b[1]) }.each_with_index { |item, index|
     break if counter && index.to_i == counter
     puts sprintf('%5d  %s ', item[1], item[0])
+  }
+
+  puts
+  puts 'Thumbprint statistics:'
+  puts
+  puts 'Count  Thumbprint'
+  thumbprint_stats.sort { |a, b| -1 * (a[1] <=> b[1]) }.each_with_index { |item, index|
+    break if counter && index.to_i == counter
+    puts sprintf('%5d  %s  %s', item[1], item[0], thumbprint_subject[item[0]])
   }
 
   puts
