@@ -134,6 +134,11 @@ class ParseArgs
         options['Cert_Search'] = true
       end
 
+      opts.on('--thumbprint <string>', 'Search for TLS certs with the specified string in its SHA-1 thumbprint') do |s|
+        options['Thumbprint'] = s.delete(' ').downcase
+        options['Cert_Search'] = true
+      end
+
       opts.on('--cert-expired', 'Show only services where the TLS certificate has expired.') do
         options['cert_expired'] = true
         options['Cert_Search'] = true
@@ -567,6 +572,13 @@ def port_search(port_num)
                 if $params['KeyType']
                   if ssl_service.type
                     next unless ssl_service.type.downcase == $params['KeyType']
+                  end
+                end
+
+                if $params['Thumbprint']
+                  if ssl_service.thumbprint
+                    svc_thumb = ssl_service.thumbprint.delete(' ').downcase
+                    next unless svc_thumb.include?($params['Thumbprint']) 
                   end
                 end
 
