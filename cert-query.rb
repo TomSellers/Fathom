@@ -129,7 +129,7 @@ class ParseArgs
         options['Cert_Search'] = true
       end
 
-      opts.on('--key-type <string>', 'Search for TLS certs with the specified key type') do |s|
+      opts.on('--key-type <string>', 'Search for TLS certs with the specified key type (RSA/ECDSA/DSA)') do |s|
         options['KeyType'] = s.downcase
         options['Cert_Search'] = true
       end
