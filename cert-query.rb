@@ -217,7 +217,7 @@ class ParseArgs
         options['Exclude_port'] = e.to_i
       end
 
-      opts.on('-x', '--exclude-service <string>', '*Exclude service where the service name or product matches the specified string') do |x|
+      opts.on('-x', '--exclude-service <string>', 'Exclude service where the service name or product matches the specified string') do |x|
         options['Exclude'] = x.downcase
       end
 
@@ -333,14 +333,16 @@ end # exit_interrupt
 
 def exit_normal
 
-  if $error_message
-    puts
-    puts
-    puts '##############################################################################'
-    puts '# Errors during operation:'
-    puts "# #{$error_message}"
-    puts '##############################################################################'
-  end # $error_message
+  unless $params['Format_bare'] || $params['Format_csv']
+    if $error_message
+      puts
+      puts
+      puts '##############################################################################'
+      puts '# Errors during operation:'
+      puts "# #{$error_message}"
+      puts '##############################################################################'
+    end # $error_message
+  end
 
   $reportfile.close if $reportfile
   exit
@@ -429,7 +431,7 @@ def gen_output
     end
   }
 
-  unless $params['Format_bare']
+  unless $params['Format_bare'] || $params['Format_csv']
     puts "\r\nTotal output hosts:  #{counter}"
     # endtime = Time.now - $starttime
     # puts "Runtime #{endtime}"

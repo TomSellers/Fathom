@@ -5,6 +5,7 @@
     Search:  cert-query.rb - Added ability to search based on service, product, and information fields
 
     BUG: cert-query.rb - Fixed bug when searching for sig-algo alone 
+    BUG: Removed errors related to XML parsing from Bare and CSV formatted output
   
 
 0.98.01 2015.11.21

@@ -346,14 +346,16 @@ end # exit_interrupt
 
 def exit_normal
 
-  if $error_message
-    puts
-    puts
-    puts '##############################################################################'
-    puts '# Errors during operation:'
-    puts "# #{$error_message}"
-    puts '##############################################################################'
-  end # $error_message
+  unless $params['Format_bare'] || $params['Format_csv']
+	  if $error_message
+	    puts
+	    puts
+	    puts '##############################################################################'
+	    puts '# Errors during operation:'
+	    puts "# #{$error_message}"
+	    puts '##############################################################################'
+	  end # $error_message
+	end
 
   $reportfile.close if $reportfile
   exit
