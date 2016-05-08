@@ -2,6 +2,7 @@
 
     Search:  cert-query.rb - Added ability to search based on the certificate key type (RSA/ECDSA/DSA)
     Search:  cert-query.rb - Added ability to search based on the certificate SHA-1 thumbprint
+    Search:  cert-query.rb - Added ability to search based on service, product, and information fields
 
     BUG: cert-query.rb - Fixed bug when searching for sig-algo alone 
   

@@ -144,9 +144,8 @@ class ParseArgs
         options['Cert_Search'] = true
       end
 
-      opts.on('-s', '--service <string>', '*Search service, product and information fields for the specified string') do |s|
+      opts.on('-s', '--service <string>', 'Search service, product, and information fields for the specified string') do |s|
         options['Service'] = s.downcase
-        legal_option = true
       end
 
       opts.on('-o', '--operating-system <string>', 'Search for specified OS string') do |o|
