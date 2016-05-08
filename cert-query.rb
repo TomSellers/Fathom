@@ -129,6 +129,11 @@ class ParseArgs
         options['Cert_Search'] = true
       end
 
+      opts.on('--key-type <string>', 'Search for TLS certs with the specified key type') do |s|
+        options['KeyType'] = s.downcase
+        options['Cert_Search'] = true
+      end
+
       opts.on('--cert-expired', 'Show only services where the TLS certificate has expired.') do
         options['cert_expired'] = true
         options['Cert_Search'] = true
@@ -556,6 +561,12 @@ def port_search(port_num)
 
                   if $params['KeyMin']
                     next if ssl_service.bits < $params['KeyMin']
+                  end
+                end
+
+                if $params['KeyType']
+                  if ssl_service.type
+                    next unless ssl_service.type.downcase == $params['KeyType']
                   end
                 end
 

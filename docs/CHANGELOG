@@ -1,5 +1,7 @@
 0.98.02 2016.xx.xx
 
+    Search:  cert-query.rb - Added ability to search based on the certificate key type (RSA/ECDSA/DSA)
+
     BUG: cert-query.rb - Fixed bug when searching for sig-algo alone 
   
 
