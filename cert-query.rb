@@ -245,7 +245,7 @@ class ParseArgs
 
       opts.on('-r', '--report <filename>', '*Output results to specified file, as opposed to the terminal') do |r|
         if File.exist?(r)
-          if !File.writable?(r)
+          unless File.writable?(r)
             puts
             puts "Error:  Specified output (#{r}) file exists, but cannot be written to."
             puts '        The file may be locked or your account may not have permssion to write to it.'
@@ -261,7 +261,7 @@ class ParseArgs
         options['Format_bare'] = true
       end
 
-      opts.on('-c', '--csv', '*Output results in CSV format') do
+      opts.on('-c', '--csv', 'Output results in CSV format') do
         options['Format_csv'] = true
       end
 
@@ -300,17 +300,17 @@ class ParseArgs
       exit
     end
 
-    if !legal_option
+    unless legal_option
       options['All_Ports'] = true
       options['Port'] = 'all'
       legal_option = true
-    end #!legal_option
+    end # !legal_option
 
     options
 
-  end  #self.parse(args)
+  end  # self.parse(args)
 
-end  #ParseArgs
+end  # ParseArgs
 
 
 def exit_interrupt
@@ -402,7 +402,6 @@ class SSLPort
       match = thumbprint_regex.match(ssl_port.script('ssl-cert').output)
       @thumbprint = match[1] if match
 
-
     end
 
   end
@@ -415,7 +414,7 @@ def gen_output
 
   if $reportfile
     $reportfile.puts 'IP address,hostname,port,service,product,version,bits,type,issued,expires,subject,issuer,scan date'
-  elsif !$params['Format_bare'] 
+  elsif !$params['Format_bare']
     puts 'IP address,hostname,port,service,product,version,bits,type,issued,expires,subject,issuer,sigalgo,scan date'
   end
 
@@ -470,7 +469,6 @@ def port_search(port_num)
         next if scan_date > $params['End_date']
       end
 
-
       parser.hosts('up') do |host|
 
         # Host level filtering here
@@ -489,7 +487,7 @@ def port_search(port_num)
         end
 
         host.getports(:any, 'open') do |port|
-          next unless (port.num == port_num || $params['All_Ports'])
+          next unless port.num == port_num || $params['All_Ports']
           next if (port.state == 'open|filtered') && (port.reason == 'no-response')
 
           # Port level filtering here
@@ -499,7 +497,6 @@ def port_search(port_num)
             end
           end
 
-
           if port.service.tunnel == 'ssl'
 
             # Service string matching for INCLUSION or EXCLUSION in result set
@@ -507,13 +504,8 @@ def port_search(port_num)
 
               port_string = nil
 
-              if port.service.name
-                port_string = port.service.name
-              end
-
-              if port.service.tunnel
-                port_string = port.service.tunnel + '/' + port_string
-              end
+              port_string = port.service.name if port.service.name
+              port_string = port.service.tunnel + '/' + port_string if port.service.tunnel
 
               # Use the same benchmark as nmap (name_confidence in portlist.cc)
               # to determine the need for the ? on the end of the service name
@@ -521,18 +513,9 @@ def port_search(port_num)
                 port_string = port_string + '?'
               end
 
-              if port.service.product
-                port_string += ' ' + port.service.product
-              end
-
-              if port.service.version
-                port_string += ' ' + port.service.version
-              end
-
-              if port.service.extra
-                port_string += ' ' + port.service.extra
-              end
-
+              port_string += ' ' + port.service.product if port.service.product
+              port_string += ' ' + port.service.version if port.service.version
+              port_string += ' ' + port.service.extra if port.service.extra
               port_string = port_string.downcase
 
               if $params['Service']
@@ -656,7 +639,7 @@ def statistics
     issuer_stats["#{port.issuer}"]           += 1 # if port.issuer
     subject_stats["#{port.subject}"]         += 1 # if port.subject
     type_stats["#{port.type}"]               += 1 # if port.type
-    thumbprint_stats["#{port.thumbprint}"]  += 1 # if port.thumbprint
+    thumbprint_stats["#{port.thumbprint}"]   += 1 # if port.thumbprint
     if thumbprint_stats["#{port.thumbprint}"] > 1
       thumbprint_subject["#{port.thumbprint}"] = port.subject
     end
@@ -675,7 +658,6 @@ def statistics
     break if counter && index.to_i == counter
     puts sprintf('%5d  %s ', item[1], item[0])
   }
-
 
   puts
   puts 'Service statistics:'
@@ -703,7 +685,7 @@ def statistics
     break if counter && index.to_i == counter
     puts sprintf('%5d  %s ', item[1], item[0])
   }
-    
+
   puts
   puts 'Signature Algorithm statistics:'
   puts
@@ -721,7 +703,7 @@ def statistics
     break if counter && index.to_i == counter
     puts sprintf('%5d  %s ', item[1], item[0])
   }
- 
+
   puts
   puts 'Subject statistics:'
   puts
