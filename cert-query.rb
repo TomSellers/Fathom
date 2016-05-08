@@ -147,7 +147,6 @@ class ParseArgs
       opts.on('--sig-algo <string>', 'Search for TLS certs signed with a certain signature algorithm') do |sig_algo|
         options['Sigalgo'] = sig_algo.to_s.downcase
         options['Cert_Search'] = true
-        legal_option = true
       end
 
       opts.on('--all-ports', 'Return a list of all open ports in the logs') do
@@ -271,7 +270,7 @@ class ParseArgs
 
       opts.on('-v', '--version', 'Show version information') do
         puts
-        puts "\tssl-query #{Prog_version} by Tom Sellers"
+        puts "\tcert-query #{Prog_version} by Tom Sellers"
         puts
         puts "\tSupporting software versions:"
         puts "\t\tRuby version:          #{RUBY_VERSION}"
