@@ -1,9 +1,14 @@
+0.98.02 2016.xx.xx
+
+    BUG: cert-query.rb - Fixed bug when searching for sig-algo alone 
+  
+
 0.98.01 2015.11.21
 
     ssl-query.rb has been renamed to cert-query.rb
 
-    Search:  cert-query.rb - added ability to search based on the certificate's signature algorithm 
-    Search:  cert-query.rb - added certificate's signature algorithm to output
+    Search:  cert-query.rb - Added ability to search based on the certificate's signature algorithm 
+    Search:  cert-query.rb - Added certificate's signature algorithm to output
     
     General: cert-query.rb - Added --metrics to report certificate attribute stats, filterable by port, etc.
     General: fathom.rb    - Added MAC address vendor to --metrics data
