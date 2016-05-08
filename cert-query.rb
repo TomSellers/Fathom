@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 #
-#  ssl-query.rb
+#  cert-query.rb
 #
 #  Searches nmap XML output for ssl related port, service, script output
 #
@@ -104,7 +104,7 @@ class ParseArgs
     options['Cert_Search'] = false
 
     opts = OptionParser.new do |opts|
-      opts.banner = 'Usage: ssl-query.rb [options]'
+      opts.banner = 'Usage: cert-query.rb [options]'
 
       opts.separator ''
       opts.separator 'Query options:'
