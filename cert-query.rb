@@ -432,8 +432,8 @@ def gen_output
 
   unless $params['Format_bare']
     puts "\r\nTotal output hosts:  #{counter}"
-    endtime = Time.now - $starttime
-    puts "Runtime #{endtime}"
+    # endtime = Time.now - $starttime
+    # puts "Runtime #{endtime}"
   end
 
 end
