@@ -41,13 +41,4 @@ The scanning portion will be published in the coming months.
 	
 # Installation
 
-1. Fork or download the master branch from Github
-   https://github.com/TomSellers/Fathom
-
-2. If required, unzip the files into the folder of your choice.
-
-3. Launch a command line interface (bash, cmd, etc) and change to the fathom folder.
-
-4. Populate the logs subdirectory with the Nmap XML files or locate the files you wish 
-   to parse. Custom locations can be specified using the -l or --log-dir switches.
-
+Installation instructions can be found in this project's Wiki: https://github.com/TomSellers/Fathom/wiki
