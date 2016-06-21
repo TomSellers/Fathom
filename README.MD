@@ -14,31 +14,6 @@ The scanning portion will be published in the coming months.
 
 
 
-# Requirements
-
-1. Ruby 1.9.1
-	Ubuntu:
->		sudo apt-get install ruby1.9.1-full rubygems1.9.1 rdoc1.9.1
->		sudo ln -s /usr/bin/ruby1.9.1 /usr/bin/ruby
-
-2. Ruby Nmap::Parser by Kris Katterjohn
-   http://rubynmap.sourceforge.net/
-
-	1.  Via Ruby Gems:
->	  	gem install nmap-parser
-
-	2.  Via SourceForge download
->		http://sourceforge.net/projects/rubynmap/files/
->		Download 0.3.5 or latest
->		Unpack - Example:   tar -xvf ruby-nmap-parser-0.3.5.tgz
->		cd ruby-nmap-parser-0.3.5
->		sudo ruby setup.rb all	
-
-	3.  Via SVN:
->		svn co https://rubynmap.svn.sourceforge.net/svnroot/rubynmap/trunk 
->		cd trunk
->		sudo ruby setup.rb all
-	
 # Installation
 
 Installation instructions can be found in this project's Wiki: https://github.com/TomSellers/Fathom/wiki
