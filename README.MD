@@ -5,9 +5,6 @@ Nmap to better understand your environment. The core tools are written in Ruby
 and leverage Kris Katterjohn's Nmap::Parser Ruby library for searching and 
 manipulating Nmap's XML output. 
 
-The primary tool is fathom itself which parses Nmap XML output and searches 
-for various data.  fp-print performs a similar function, but searches for
-service and OS fingerprints.
 
 | Tool | Summary|
 | :---- | :-------|
