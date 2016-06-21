@@ -20,6 +20,9 @@ service and OS fingerprints.
 | mt-sweep-full.sh | Full scan (scripts/ver detection) of every IP in ./list/scanlist-random.txt, multiple targets at a time |
 | scan-recon.sh | Port scan only of a single user provided IP address |
 | sweep-recon.sh | Port scan only of every IP in ./lists/scanlist-random.txt, one at a time |
+| update-data.sh | Rescans hosts in the ./logs/ directory starting with the oldest, one at a time |
+| mt-update-data.sh | Rescans hosts in the ./logs/ directory starting with the oldest, multiple targets at a time |
+| util-genlist.sh | Takes all subnets in ./lists/subnets.txt, expands, randomizes, and saves to ./lists/scanlist-random.txt |
 
 
 # Installation
