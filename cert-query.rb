@@ -640,7 +640,7 @@ def statistics
     subject_stats["#{port.subject}"]         += 1 # if port.subject
     type_stats["#{port.type}"]               += 1 # if port.type
     thumbprint_stats["#{port.thumbprint}"]   += 1 # if port.thumbprint
-    if thumbprint_stats["#{port.thumbprint}"] > 1
+    if thumbprint_stats["#{port.thumbprint}"]
       thumbprint_subject["#{port.thumbprint}"] = port.subject
     end
   }
